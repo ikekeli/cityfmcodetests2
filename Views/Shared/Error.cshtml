@@ -1,0 +1,37 @@
+@{
+    // View
+    View = this;
+
+    // Check action result
+    if (error.ActionResult is EmptyResult) { // Terminate page
+        return;
+    }
+
+    // Layout
+    if (!error.UseLayout) // UseLayout = false // DN
+        Layout = "";
+    else
+        Layout = "_Layout";
+
+    // Local variables (Temp data)
+    #pragma warning disable 168
+    string? sqlWrk, filterWrk, whereWrk, curVal, dispVal;
+    List<Dictionary<string, object>>? rswrk;
+    string[]? arWrk;
+    List<object?>? listWrk;
+    object? guidWrk;
+    Func<string>? lookupFilter;
+    #pragma warning restore 168
+}
+<div class="error-page">
+    <div class="error-content">
+        <h3><i class="fa-solid fa-exclamation-triangle text-danger"></i> @Html.Raw(Language.Phrase("Oops"))</h3>
+        <p>@Html.Raw(CurrentPage.GetFailureMessage())</p>
+        @if (CurrentPage.ShowExceptionPath) {
+            <p>@CurrentPage.ExceptionPath</p>
+        }
+    </div>
+    <!-- /.error-content -->
+</div>
+<!-- /.error-page -->
+@Html.Raw(GetDebugMessage())

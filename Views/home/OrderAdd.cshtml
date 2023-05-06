@@ -1,0 +1,216 @@
+@{
+    // View
+    View = this;
+
+    // Check action result
+    if (orderAdd.ActionResult is EmptyResult) { // Terminate page
+        return;
+    }
+
+    // Layout
+    if (!orderAdd.UseLayout) // UseLayout = false // DN
+        Layout = "";
+    else
+        Layout = "_Layout";
+
+    // Local variables (Temp data)
+    #pragma warning disable 168
+    string? sqlWrk, filterWrk, whereWrk, curVal, dispVal;
+    List<Dictionary<string, object>>? rswrk;
+    string[]? arWrk;
+    List<object?>? listWrk;
+    object? guidWrk;
+    Func<string>? lookupFilter;
+    #pragma warning restore 168
+}
+<script>
+var currentTable = @Html.Raw(ConvertToJson(orderAdd.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { order: currentTable } });
+var currentPageID = ew.PAGE_ID = "add";
+var currentForm;
+var forderadd;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery;
+    let fields = currentTable.fields;
+
+    // Form object
+    let form = new ew.FormBuilder()
+        .setId("forderadd")
+        .setPageId("add")
+
+        // Add fields
+        .setFields([
+
+            ["customerName", [fields.customerName.visible && fields.customerName.required ? ew.Validators.required(fields.customerName.caption) : null], fields.customerName.isInvalid],
+            ["customerEmail", [fields.customerEmail.visible && fields.customerEmail.required ? ew.Validators.required(fields.customerEmail.caption) : null], fields.customerEmail.isInvalid],
+            ["lineItems", [fields.lineItems.visible && fields.lineItems.required ? ew.Validators.required(fields.lineItems.caption) : null], fields.lineItems.isInvalid]
+        ])
+
+        // Form_CustomValidate
+        .setCustomValidate(
+            function(fobj) { // DO NOT CHANGE THIS LINE!
+                    // Your custom validation code here, return false if invalid.
+                    return true;
+                }
+        )
+
+        // Use JavaScript validation or not
+        .setValidateRequired(ew.CLIENT_VALIDATE)
+
+        // Dynamic selection lists
+        .setLists({
+            "lineItems": @Html.Raw(orderAdd.lineItems.ToClientList(orderAdd)),
+        })
+        .build();
+    window[form.id] = form;
+    currentForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<script>
+loadjs.ready("head", function() {
+    // Write your client script here, no need to add script tags.
+});
+</script>
+@orderAdd.ShowPageHeader()
+@orderAdd.ShowMessages()
+<form name="forderadd" id="forderadd" class="@(orderAdd.FormClassName)" action="@AppPath(CurrentPageName())" method="post" novalidate autocomplete="on">
+@if (CurrentPage.CheckToken) {
+    <input type="hidden" name="@Config.TokenNameKey" value="@Config.TokenName"><!-- CSRF token name -->
+    @Html.AntiForgeryToken()
+}
+@if (orderAdd.IsConfirm) { // Confirm page
+<input type="hidden" name="action" id="action" value="insert">
+<input type="hidden" name="confirm" id="confirm" value="confirm">
+} else {
+<input type="hidden" name="action" id="action" value="confirm">
+}
+<input type="hidden" name="modal" value="@ConvertToInt(orderAdd.IsModal)">
+@if (IsJsonResponse()) {
+<input type="hidden" name="json" value="1">
+}
+<input type="hidden" name="@(orderAdd.OldKeyName)" value="@Html.Raw(orderAdd.OldKey)">
+<div class="ew-add-div"><!-- page* -->
+@if (orderAdd.customerName.Visible) { // orderAdd.customerName.Visible (begin)
+    <div id="r_customerName" @Html.Raw(orderAdd.customerName.RowAttributes)>
+        <label id="elh_order_customerName" for="x_customerName" class="@(orderAdd.LeftColumnClass)">@Html.Raw(orderAdd.customerName.Caption)@Html.Raw(orderAdd.customerName.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(orderAdd.RightColumnClass)"><div @Html.Raw(orderAdd.customerName.CellAttributes)>
+@if (!orderAdd.IsConfirm) { // customerName (begin)
+<span id="el_order_customerName">
+<input type="@(orderAdd.customerName.InputTextType)" name="x_customerName" id="x_customerName" data-table="order" data-field="x_customerName" value="@Html.Raw(orderAdd.customerName.EditValue)" size="30" maxlength="250" placeholder="@Html.Raw(HtmlEncode(orderAdd.customerName.PlaceHolder))" data-format-pattern="@(orderAdd.customerName.FormatPattern)"@Html.Raw(orderAdd.customerName.EditAttributes) aria-describedby="x_customerName_help">
+@Html.Raw(orderAdd.customerName.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(orderAdd.customerName.GetErrorMessage())</div>
+</span>
+} else { // customerName (confirm)
+<span id="el_order_customerName">
+<span @Html.Raw(orderAdd.customerName.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(orderAdd.customerName.ViewValue)))"></span>
+<input type="hidden" data-table="order" data-field="x_customerName" data-hidden="1" name="x_customerName" id="x_customerName" value="@Html.Raw(HtmlEncode(orderAdd.customerName.FormValue))">
+</span>
+} @* customerName (end) *@
+</div></div>
+    </div>
+} @* orderAdd.customerName.Visible (end) *@
+@if (orderAdd.customerEmail.Visible) { // orderAdd.customerEmail.Visible (begin)
+    <div id="r_customerEmail" @Html.Raw(orderAdd.customerEmail.RowAttributes)>
+        <label id="elh_order_customerEmail" for="x_customerEmail" class="@(orderAdd.LeftColumnClass)">@Html.Raw(orderAdd.customerEmail.Caption)@Html.Raw(orderAdd.customerEmail.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(orderAdd.RightColumnClass)"><div @Html.Raw(orderAdd.customerEmail.CellAttributes)>
+@if (!orderAdd.IsConfirm) { // customerEmail (begin)
+<span id="el_order_customerEmail">
+<input type="@(orderAdd.customerEmail.InputTextType)" name="x_customerEmail" id="x_customerEmail" data-table="order" data-field="x_customerEmail" value="@Html.Raw(orderAdd.customerEmail.EditValue)" size="30" maxlength="150" placeholder="@Html.Raw(HtmlEncode(orderAdd.customerEmail.PlaceHolder))" data-format-pattern="@(orderAdd.customerEmail.FormatPattern)"@Html.Raw(orderAdd.customerEmail.EditAttributes) aria-describedby="x_customerEmail_help">
+@Html.Raw(orderAdd.customerEmail.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(orderAdd.customerEmail.GetErrorMessage())</div>
+</span>
+} else { // customerEmail (confirm)
+<span id="el_order_customerEmail">
+<span @Html.Raw(orderAdd.customerEmail.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(orderAdd.customerEmail.ViewValue)))"></span>
+<input type="hidden" data-table="order" data-field="x_customerEmail" data-hidden="1" name="x_customerEmail" id="x_customerEmail" value="@Html.Raw(HtmlEncode(orderAdd.customerEmail.FormValue))">
+</span>
+} @* customerEmail (end) *@
+</div></div>
+    </div>
+} @* orderAdd.customerEmail.Visible (end) *@
+@if (orderAdd.lineItems.Visible) { // orderAdd.lineItems.Visible (begin)
+    <div id="r_lineItems" @Html.Raw(orderAdd.lineItems.RowAttributes)>
+        <label id="elh_order_lineItems" for="x_lineItems" class="@(orderAdd.LeftColumnClass)">@Html.Raw(orderAdd.lineItems.Caption)@Html.Raw(orderAdd.lineItems.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(orderAdd.RightColumnClass)"><div @Html.Raw(orderAdd.lineItems.CellAttributes)>
+@if (!orderAdd.IsConfirm) { // lineItems (begin)
+<span id="el_order_lineItems">
+    <select
+        id="x_lineItems"
+        name="x_lineItems"
+        class="form-select ew-select@(orderAdd.lineItems.IsInvalidClass)"
+        data-select2-id="forderadd_x_lineItems"
+        data-table="order"
+        data-field="x_lineItems"
+        data-value-separator="@(orderAdd.lineItems.DisplayValueSeparatorAttribute)"
+        data-placeholder="@(HtmlEncode(orderAdd.lineItems.PlaceHolder))"
+        @Html.Raw(orderAdd.lineItems.EditAttributes)>
+        @(orderAdd.lineItems.SelectOptionListHtml("x_lineItems"))
+    </select>
+    @Html.Raw(orderAdd.lineItems.GetCustomMessage)
+    <div class="invalid-feedback">@Html.Raw(orderAdd.lineItems.GetErrorMessage())</div>
+@Html.Raw(orderAdd.lineItems.Lookup.GetParamTag(orderAdd, "p_x_lineItems"))
+<script>
+loadjs.ready("forderadd", function() {
+    var options = { name: "x_lineItems", selectId: "forderadd_x_lineItems" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (forderadd.lists.lineItems?.lookupOptions.length) {
+        options.data = { id: "x_lineItems", form: "forderadd" };
+    } else {
+        options.ajax = { id: "x_lineItems", form: "forderadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.order.fields.lineItems.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+} else { // lineItems (confirm)
+<span id="el_order_lineItems">
+<span @Html.Raw(orderAdd.lineItems.ViewAttributes)>
+<span class="form-control-plaintext">@Html.Raw(orderAdd.lineItems.DisplayValue(orderAdd.lineItems.ViewValue))</span></span>
+<input type="hidden" data-table="order" data-field="x_lineItems" data-hidden="1" name="x_lineItems" id="x_lineItems" value="@Html.Raw(HtmlEncode(orderAdd.lineItems.FormValue))">
+</span>
+} @* lineItems (end) *@
+</div></div>
+    </div>
+} @* orderAdd.lineItems.Visible (end) *@
+</div><!-- /page* -->
+@{ orderAdd.CloseRecordset(); }
+@Html.Raw(orderAdd.IsModal ? "<template class=\"ew-modal-buttons\">" : "<div class=\"row ew-buttons\">")<!-- buttons .row -->
+    <div class="@(orderAdd.OffsetColumnClass)"><!-- buttons offset -->
+@if (!orderAdd.IsConfirm) { // Confirm page
+    <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="forderadd" data-ew-action="set-action" data-value="confirm">@Html.Raw(Language.Phrase("AddBtn"))</button>
+@if (IsJsonResponse()) {
+    <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-bs-dismiss="modal">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+} else {
+    <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" form="forderadd" data-href="@AppPath(orderAdd.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+}
+} else {
+    <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="forderadd">@Html.Raw(Language.Phrase("ConfirmBtn"))</button>
+    <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="submit" form="forderadd" data-ew-action="set-action" data-value="cancel">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+}
+    </div><!-- /buttons offset -->
+@Html.Raw(orderAdd.IsModal ? "</template>" : "</div>")<!-- /buttons .row -->
+</form>
+@orderAdd.ShowPageFooter()
+@Html.Raw(GetDebugMessage())
+@ElapsedTime()
+<script>
+// Field event handlers
+loadjs.ready("head", function() {
+    ew.addEventHandlers("order");
+});
+</script>
+<script>
+loadjs.ready("load", function() {
+    // Write your table-specific startup script here
+    // document.write("page loaded");
+});
+</script>

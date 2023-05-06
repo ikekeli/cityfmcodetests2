@@ -1,0 +1,290 @@
+@{
+    // View
+    View = this;
+
+    // Check action result
+    if (productList.ActionResult is EmptyResult) { // Terminate page
+        return;
+    }
+
+    // Layout
+    if (!productList.UseLayout) // UseLayout = false // DN
+        Layout = "";
+    else
+        Layout = "_Layout";
+
+    // Local variables (Temp data)
+    #pragma warning disable 168
+    string? sqlWrk, filterWrk, whereWrk, curVal, dispVal;
+    List<Dictionary<string, object>>? rswrk;
+    string[]? arWrk;
+    List<object?>? listWrk;
+    object? guidWrk;
+    Func<string>? lookupFilter;
+    #pragma warning restore 168
+}
+@if (!productList.IsExport()) {
+<script>
+var currentTable = @Html.Raw(ConvertToJson(productList.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { product: currentTable } });
+var currentPageID = ew.PAGE_ID = "list";
+var currentForm;
+var @(productList.FormName);
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery;
+    let fields = currentTable.fields;
+
+    // Form object
+    let form = new ew.FormBuilder()
+        .setId("@(productList.FormName)")
+        .setPageId("list")
+        .setSubmitWithFetch(@(productList.UseAjaxActions ? "true" : "false"))
+        .setFormKeyCountName("@(productList.FormKeyCountName)")
+        .build();
+    window[form.id] = form;
+    currentForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<script>
+loadjs.ready("head", function() {
+    // Write your client script here, no need to add script tags.
+});
+</script>
+}
+@if (!productList.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+@if (productList.TotalRecords > 0 && productList.ExportOptions.Visible) {
+    productList.ExportOptions.Render("body");
+}
+@if (productList.ImportOptions.Visible) {
+    productList.ImportOptions.Render("body");
+}
+@if (productList.SearchOptions.Visible) {
+    productList.SearchOptions.Render("body");
+}
+@if (productList.FilterOptions.Visible) {
+    productList.FilterOptions.Render("body");
+}
+</div>
+}
+@if (!productList.IsModal) {
+<form name="fproductsrch" id="fproductsrch" class="ew-form ew-ext-search-form" action="@AppPath(CurrentPageName())" novalidate autocomplete="on">
+<div id="fproductsrch_search_panel" class="mb-2 mb-sm-0 @(productList.SearchPanelClass)"><!-- .ew-search-panel -->
+<script>
+var currentTable = @Html.Raw(ConvertToJson(productList.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { product: currentTable } });
+var currentForm;
+var fproductsrch, currentSearchForm, currentAdvancedSearchForm;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery,
+        fields = currentTable.fields;
+
+    // Form object for search
+    let form = new ew.FormBuilder()
+        .setId("fproductsrch")
+        .setPageId("list")
+@if (productList.UseAjaxActions) {
+        <text>.setSubmitWithFetch(true)</text>
+}
+
+        // Dynamic selection lists
+        .setLists({
+        })
+
+        // Filters
+        .setFilterList(@Html.Raw(await productList.GetFilterList()))
+        .build();
+    window[form.id] = form;
+    currentSearchForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<input type="hidden" name="cmd" value="search">
+@if (!productList.IsExport() && Empty(productList.CurrentAction) && productList.HasSearchFields()) { @* Show search form (begin) *@
+<div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0">
+    <div class="col-sm-auto px-0 pe-sm-2">
+        <div class="ew-basic-search input-group">
+            <input type="search" name="@(Config.TableBasicSearch)" id="@(Config.TableBasicSearch)" class="form-control ew-basic-search-keyword" value="@Html.Raw(HtmlEncode(productList.BasicSearch.SessionKeyword))" placeholder="@(HtmlEncode(Language.Phrase("Search")))" aria-label="@(HtmlEncode(Language.Phrase("Search")))">
+            <input type="hidden" name="@(Config.TableBasicSearchType)" id="@(Config.TableBasicSearchType)" class="ew-basic-search-type" value="@(HtmlEncode(productList.BasicSearch.SessionType))">
+            <button type="button" data-bs-toggle="dropdown" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false">
+                <span id="searchtype">@Html.Raw(productList.BasicSearch.TypeNameShort)</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+                <button type="button" class="dropdown-item@(productList.BasicSearch.SessionType == "" ? " active" : "")" form="fproductsrch" data-ew-action="search-type">@Html.Raw(Language.Phrase("QuickSearchAuto"))</button>
+                <button type="button" class="dropdown-item@(productList.BasicSearch.SessionType == "=" ? " active" : "")" form="fproductsrch" data-ew-action="search-type" data-search-type="=">@Html.Raw(Language.Phrase("QuickSearchExact"))</button>
+                <button type="button" class="dropdown-item@(productList.BasicSearch.SessionType == "AND" ? " active" : "")" form="fproductsrch" data-ew-action="search-type" data-search-type="AND">@Html.Raw(Language.Phrase("QuickSearchAll"))</button>
+                <button type="button" class="dropdown-item@(productList.BasicSearch.SessionType == "OR" ? " active" : "")" form="fproductsrch" data-ew-action="search-type" data-search-type="OR">@Html.Raw(Language.Phrase("QuickSearchAny"))</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-auto mb-3">
+        <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit">@Html.Raw(Language.Phrase("SearchBtn"))</button>
+    </div>
+</div>
+</div><!-- /.ew-extended-search -->
+} @* Show search form (end) *@
+</div><!-- /.ew-search-panel -->
+</form>
+}
+@productList.ShowPageHeader()
+@productList.ShowMessages()
+<main class="list @(productList.TotalRecords == 0 && !productList.IsAdd ? " ew-no-record" : "")">
+<div id="ew-list">
+@if (productList.TotalRecords > 0 || !Empty(productList.CurrentAction)) {
+<div class="card ew-card ew-grid@(productList.IsAddOrEdit ? " ew-grid-add-edit" : "") @(productList.TableGridClass)">
+<form name="@(productList.FormName)" id="@(productList.FormName)" class="ew-form ew-list-form" action="@AppPath(productList.PageName)" method="post" novalidate autocomplete="on">
+@if (CurrentPage.CheckToken) {
+    <input type="hidden" name="@Config.TokenNameKey" value="@Config.TokenName"><!-- CSRF token name -->
+    @Html.AntiForgeryToken()
+}
+@if (productList.IsModal) {
+<input type="hidden" name="modal" value="1">
+}
+<div id="gmp_product" class="card-body ew-grid-middle-panel @(productList.TableContainerClass)" style="@(productList.TableContainerStyle)">
+@if (productList.TotalRecords > 0 || productList.IsGridEdit || productList.IsMultiEdit) {
+<table id="tbl_productlist" class="@(productList.TableClass)"><!-- .ew-table -->
+<thead>
+    <tr class="ew-table-header">
+@{
+    // Header row
+    productList.RowType = RowType.Header;
+
+    // Render list options
+    await productList.RenderListOptions();
+}
+@* Render list options (header, left) *@
+@productList.ListOptions.RenderHeader("left")
+@if (productList.productId.Visible) { // productList.productId.Visible (begin)
+        <th data-name="productId" class="@(productList.productId.HeaderCellClass)"><div id="elh_product_productId" class="product_productId">@Html.Raw(productList.RenderFieldHeader(productList.productId))</div></th>
+} @* productList.productId.Visible (end) *@
+@if (productList._name.Visible) { // productList._name.Visible (begin)
+        <th data-name="_name" class="@(productList._name.HeaderCellClass)"><div id="elh_product__name" class="product__name">@Html.Raw(productList.RenderFieldHeader(productList._name))</div></th>
+} @* productList._name.Visible (end) *@
+@if (productList.description.Visible) { // productList.description.Visible (begin)
+        <th data-name="description" class="@(productList.description.HeaderCellClass)"><div id="elh_product_description" class="product_description">@Html.Raw(productList.RenderFieldHeader(productList.description))</div></th>
+} @* productList.description.Visible (end) *@
+@if (productList.unitPrice.Visible) { // productList.unitPrice.Visible (begin)
+        <th data-name="unitPrice" class="@(productList.unitPrice.HeaderCellClass)"><div id="elh_product_unitPrice" class="product_unitPrice">@Html.Raw(productList.RenderFieldHeader(productList.unitPrice))</div></th>
+} @* productList.unitPrice.Visible (end) *@
+@if (productList.maximumQuantity.Visible) { // productList.maximumQuantity.Visible (begin)
+        <th data-name="maximumQuantity" class="@(productList.maximumQuantity.HeaderCellClass)"><div id="elh_product_maximumQuantity" class="product_maximumQuantity">@Html.Raw(productList.RenderFieldHeader(productList.maximumQuantity))</div></th>
+} @* productList.maximumQuantity.Visible (end) *@
+@* Render list options (header, right) *@
+@productList.ListOptions.RenderHeader("right")
+    </tr>
+</thead>
+<tbody data-page="@(productList.PageNumber)">
+@{
+    await productList.SetupGrid();
+    bool eof = productList.Recordset == null; // DN
+}
+@while (productList.RecordCount < productList.StopRecord || SameString(productList.RowIndex, "$rowindex$")) { // Begin While
+    if (!eof && !SameString(productList.RowIndex, "$rowindex$") &&
+        (!productList.IsGridAdd || productList.CurrentMode == "copy") &&
+        (!((productList.IsCopy || productList.IsAdd) && productList.RowIndex is int rowIndex && rowIndex == 0))) // DN
+        eof = !await productList.Recordset.ReadAsync();
+    productList.RecordCount++;
+    if (productList.RecordCount >= productList.StartRecord) {
+        await productList.SetupRow();
+    <tr @Html.Raw(productList.RowAttributes)>
+    @* Render list options (body, left) *@
+    @productList.ListOptions.RenderBody("left", productList.RowCount)
+    @if (productList.productId.Visible) { // productList.productId.Visible (begin)
+        <td data-name="productId" @Html.Raw(productList.productId.CellAttributes)>
+<span id="el@(productList.RowCount)_product_productId" class="el_product_productId">
+<span @Html.Raw(productList.productId.ViewAttributes)>
+@Html.Raw(productList.productId.GetViewValue())</span>
+</span>
+</td>
+    } @* productList.productId.Visible (end) *@
+    @if (productList._name.Visible) { // productList._name.Visible (begin)
+        <td data-name="_name" @Html.Raw(productList._name.CellAttributes)>
+<span id="el@(productList.RowCount)_product__name" class="el_product__name">
+<span @Html.Raw(productList._name.ViewAttributes)>
+@Html.Raw(productList._name.GetViewValue())</span>
+</span>
+</td>
+    } @* productList._name.Visible (end) *@
+    @if (productList.description.Visible) { // productList.description.Visible (begin)
+        <td data-name="description" @Html.Raw(productList.description.CellAttributes)>
+<span id="el@(productList.RowCount)_product_description" class="el_product_description">
+<span @Html.Raw(productList.description.ViewAttributes)>
+@Html.Raw(productList.description.GetViewValue())</span>
+</span>
+</td>
+    } @* productList.description.Visible (end) *@
+    @if (productList.unitPrice.Visible) { // productList.unitPrice.Visible (begin)
+        <td data-name="unitPrice" @Html.Raw(productList.unitPrice.CellAttributes)>
+<span id="el@(productList.RowCount)_product_unitPrice" class="el_product_unitPrice">
+<span @Html.Raw(productList.unitPrice.ViewAttributes)>
+@Html.Raw(productList.unitPrice.GetViewValue())</span>
+</span>
+</td>
+    } @* productList.unitPrice.Visible (end) *@
+    @if (productList.maximumQuantity.Visible) { // productList.maximumQuantity.Visible (begin)
+        <td data-name="maximumQuantity" @Html.Raw(productList.maximumQuantity.CellAttributes)>
+<span id="el@(productList.RowCount)_product_maximumQuantity" class="el_product_maximumQuantity">
+<span @Html.Raw(productList.maximumQuantity.ViewAttributes)>
+@Html.Raw(productList.maximumQuantity.GetViewValue())</span>
+</span>
+</td>
+    } @* productList.maximumQuantity.Visible (end) *@
+    @* Render list options (body, right) *@
+    @productList.ListOptions.RenderBody("right", productList.RowCount)
+    </tr>
+    } @* End if *@
+
+    // Reset for template row
+    if (SameString(productList.RowIndex, "$rowindex$"))
+        productList.RowIndex = 0;
+
+    // Reset inline add/copy row
+    if ((productList.IsCopy || productList.IsAdd) && productList.RowIndex is int rowIndex2 && rowIndex2 == 0)
+        productList.RowIndex = 1;
+} @* End While *@
+</tbody>
+</table><!-- /.ew-table -->
+} @* End If TotalRecords > 0 *@
+</div><!-- /.ew-grid-middle-panel -->
+@if (Empty(productList.CurrentAction) && !productList.UseAjaxActions) {
+<input type="hidden" name="action" id="action" value="">
+}
+</form><!-- /.ew-list-form -->
+@{ productList.CloseRecordset(); }
+@if (!productList.IsExport()) {
+<div class="card-footer ew-grid-lower-panel">
+@if (!productList.IsGridAdd && !(productList.IsGridEdit && productList.ModalGridEdit) && !productList.IsMultiEdit) {
+@Html.Raw(productList.Pager.Render())
+}
+<div class="ew-list-other-options">
+@productList.OtherOptions.RenderBody("bottom")
+</div>
+</div>
+}
+</div><!-- /.ew-grid -->
+} else { // Show other options
+<div class="ew-list-other-options">
+@productList.OtherOptions.ForEach(opt => opt.ButtonClass = "").RenderBody()
+</div>
+}
+</div>
+</main>
+@productList.ShowPageFooter()
+@Html.Raw(GetDebugMessage())
+@ElapsedTime()
+@if (!productList.IsExport()) {
+<script>
+// Field event handlers
+loadjs.ready("head", function() {
+    ew.addEventHandlers("product");
+});
+</script>
+<script>
+loadjs.ready("load", function() {
+    // Write your table-specific startup script here
+    // document.write("page loaded");
+});
+</script>
+}

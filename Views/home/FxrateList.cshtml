@@ -1,0 +1,279 @@
+@{
+    // View
+    View = this;
+
+    // Check action result
+    if (fxrateList.ActionResult is EmptyResult) { // Terminate page
+        return;
+    }
+
+    // Layout
+    if (!fxrateList.UseLayout) // UseLayout = false // DN
+        Layout = "";
+    else
+        Layout = "_Layout";
+
+    // Local variables (Temp data)
+    #pragma warning disable 168
+    string? sqlWrk, filterWrk, whereWrk, curVal, dispVal;
+    List<Dictionary<string, object>>? rswrk;
+    string[]? arWrk;
+    List<object?>? listWrk;
+    object? guidWrk;
+    Func<string>? lookupFilter;
+    #pragma warning restore 168
+}
+@if (!fxrateList.IsExport()) {
+<script>
+var currentTable = @Html.Raw(ConvertToJson(fxrateList.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { fxrate: currentTable } });
+var currentPageID = ew.PAGE_ID = "list";
+var currentForm;
+var @(fxrateList.FormName);
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery;
+    let fields = currentTable.fields;
+
+    // Form object
+    let form = new ew.FormBuilder()
+        .setId("@(fxrateList.FormName)")
+        .setPageId("list")
+        .setSubmitWithFetch(@(fxrateList.UseAjaxActions ? "true" : "false"))
+        .setFormKeyCountName("@(fxrateList.FormKeyCountName)")
+        .build();
+    window[form.id] = form;
+    currentForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<script>
+loadjs.ready("head", function() {
+    // Write your client script here, no need to add script tags.
+});
+</script>
+}
+@if (!fxrateList.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+@if (fxrateList.TotalRecords > 0 && fxrateList.ExportOptions.Visible) {
+    fxrateList.ExportOptions.Render("body");
+}
+@if (fxrateList.ImportOptions.Visible) {
+    fxrateList.ImportOptions.Render("body");
+}
+@if (fxrateList.SearchOptions.Visible) {
+    fxrateList.SearchOptions.Render("body");
+}
+@if (fxrateList.FilterOptions.Visible) {
+    fxrateList.FilterOptions.Render("body");
+}
+</div>
+}
+@if (!fxrateList.IsModal) {
+<form name="ffxratesrch" id="ffxratesrch" class="ew-form ew-ext-search-form" action="@AppPath(CurrentPageName())" novalidate autocomplete="on">
+<div id="ffxratesrch_search_panel" class="mb-2 mb-sm-0 @(fxrateList.SearchPanelClass)"><!-- .ew-search-panel -->
+<script>
+var currentTable = @Html.Raw(ConvertToJson(fxrateList.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { fxrate: currentTable } });
+var currentForm;
+var ffxratesrch, currentSearchForm, currentAdvancedSearchForm;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery,
+        fields = currentTable.fields;
+
+    // Form object for search
+    let form = new ew.FormBuilder()
+        .setId("ffxratesrch")
+        .setPageId("list")
+@if (fxrateList.UseAjaxActions) {
+        <text>.setSubmitWithFetch(true)</text>
+}
+
+        // Dynamic selection lists
+        .setLists({
+        })
+
+        // Filters
+        .setFilterList(@Html.Raw(await fxrateList.GetFilterList()))
+        .build();
+    window[form.id] = form;
+    currentSearchForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<input type="hidden" name="cmd" value="search">
+@if (!fxrateList.IsExport() && Empty(fxrateList.CurrentAction) && fxrateList.HasSearchFields()) { @* Show search form (begin) *@
+<div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0">
+    <div class="col-sm-auto px-0 pe-sm-2">
+        <div class="ew-basic-search input-group">
+            <input type="search" name="@(Config.TableBasicSearch)" id="@(Config.TableBasicSearch)" class="form-control ew-basic-search-keyword" value="@Html.Raw(HtmlEncode(fxrateList.BasicSearch.SessionKeyword))" placeholder="@(HtmlEncode(Language.Phrase("Search")))" aria-label="@(HtmlEncode(Language.Phrase("Search")))">
+            <input type="hidden" name="@(Config.TableBasicSearchType)" id="@(Config.TableBasicSearchType)" class="ew-basic-search-type" value="@(HtmlEncode(fxrateList.BasicSearch.SessionType))">
+            <button type="button" data-bs-toggle="dropdown" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false">
+                <span id="searchtype">@Html.Raw(fxrateList.BasicSearch.TypeNameShort)</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+                <button type="button" class="dropdown-item@(fxrateList.BasicSearch.SessionType == "" ? " active" : "")" form="ffxratesrch" data-ew-action="search-type">@Html.Raw(Language.Phrase("QuickSearchAuto"))</button>
+                <button type="button" class="dropdown-item@(fxrateList.BasicSearch.SessionType == "=" ? " active" : "")" form="ffxratesrch" data-ew-action="search-type" data-search-type="=">@Html.Raw(Language.Phrase("QuickSearchExact"))</button>
+                <button type="button" class="dropdown-item@(fxrateList.BasicSearch.SessionType == "AND" ? " active" : "")" form="ffxratesrch" data-ew-action="search-type" data-search-type="AND">@Html.Raw(Language.Phrase("QuickSearchAll"))</button>
+                <button type="button" class="dropdown-item@(fxrateList.BasicSearch.SessionType == "OR" ? " active" : "")" form="ffxratesrch" data-ew-action="search-type" data-search-type="OR">@Html.Raw(Language.Phrase("QuickSearchAny"))</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-auto mb-3">
+        <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit">@Html.Raw(Language.Phrase("SearchBtn"))</button>
+    </div>
+</div>
+</div><!-- /.ew-extended-search -->
+} @* Show search form (end) *@
+</div><!-- /.ew-search-panel -->
+</form>
+}
+@fxrateList.ShowPageHeader()
+@fxrateList.ShowMessages()
+<main class="list @(fxrateList.TotalRecords == 0 && !fxrateList.IsAdd ? " ew-no-record" : "")">
+<div id="ew-list">
+@if (fxrateList.TotalRecords > 0 || !Empty(fxrateList.CurrentAction)) {
+<div class="card ew-card ew-grid@(fxrateList.IsAddOrEdit ? " ew-grid-add-edit" : "") @(fxrateList.TableGridClass)">
+<form name="@(fxrateList.FormName)" id="@(fxrateList.FormName)" class="ew-form ew-list-form" action="@AppPath(fxrateList.PageName)" method="post" novalidate autocomplete="on">
+@if (CurrentPage.CheckToken) {
+    <input type="hidden" name="@Config.TokenNameKey" value="@Config.TokenName"><!-- CSRF token name -->
+    @Html.AntiForgeryToken()
+}
+@if (fxrateList.IsModal) {
+<input type="hidden" name="modal" value="1">
+}
+<div id="gmp_fxrate" class="card-body ew-grid-middle-panel @(fxrateList.TableContainerClass)" style="@(fxrateList.TableContainerStyle)">
+@if (fxrateList.TotalRecords > 0 || fxrateList.IsGridEdit || fxrateList.IsMultiEdit) {
+<table id="tbl_fxratelist" class="@(fxrateList.TableClass)"><!-- .ew-table -->
+<thead>
+    <tr class="ew-table-header">
+@{
+    // Header row
+    fxrateList.RowType = RowType.Header;
+
+    // Render list options
+    await fxrateList.RenderListOptions();
+}
+@* Render list options (header, left) *@
+@fxrateList.ListOptions.RenderHeader("left")
+@if (fxrateList.id.Visible) { // fxrateList.id.Visible (begin)
+        <th data-name="id" class="@(fxrateList.id.HeaderCellClass)"><div id="elh_fxrate_id" class="fxrate_id">@Html.Raw(fxrateList.RenderFieldHeader(fxrateList.id))</div></th>
+} @* fxrateList.id.Visible (end) *@
+@if (fxrateList.sourceCurrency.Visible) { // fxrateList.sourceCurrency.Visible (begin)
+        <th data-name="sourceCurrency" class="@(fxrateList.sourceCurrency.HeaderCellClass)"><div id="elh_fxrate_sourceCurrency" class="fxrate_sourceCurrency">@Html.Raw(fxrateList.RenderFieldHeader(fxrateList.sourceCurrency))</div></th>
+} @* fxrateList.sourceCurrency.Visible (end) *@
+@if (fxrateList.targetCurrency.Visible) { // fxrateList.targetCurrency.Visible (begin)
+        <th data-name="targetCurrency" class="@(fxrateList.targetCurrency.HeaderCellClass)"><div id="elh_fxrate_targetCurrency" class="fxrate_targetCurrency">@Html.Raw(fxrateList.RenderFieldHeader(fxrateList.targetCurrency))</div></th>
+} @* fxrateList.targetCurrency.Visible (end) *@
+@if (fxrateList.rate.Visible) { // fxrateList.rate.Visible (begin)
+        <th data-name="rate" class="@(fxrateList.rate.HeaderCellClass)"><div id="elh_fxrate_rate" class="fxrate_rate">@Html.Raw(fxrateList.RenderFieldHeader(fxrateList.rate))</div></th>
+} @* fxrateList.rate.Visible (end) *@
+@* Render list options (header, right) *@
+@fxrateList.ListOptions.RenderHeader("right")
+    </tr>
+</thead>
+<tbody data-page="@(fxrateList.PageNumber)">
+@{
+    await fxrateList.SetupGrid();
+    bool eof = fxrateList.Recordset == null; // DN
+}
+@while (fxrateList.RecordCount < fxrateList.StopRecord || SameString(fxrateList.RowIndex, "$rowindex$")) { // Begin While
+    if (!eof && !SameString(fxrateList.RowIndex, "$rowindex$") &&
+        (!fxrateList.IsGridAdd || fxrateList.CurrentMode == "copy") &&
+        (!((fxrateList.IsCopy || fxrateList.IsAdd) && fxrateList.RowIndex is int rowIndex && rowIndex == 0))) // DN
+        eof = !await fxrateList.Recordset.ReadAsync();
+    fxrateList.RecordCount++;
+    if (fxrateList.RecordCount >= fxrateList.StartRecord) {
+        await fxrateList.SetupRow();
+    <tr @Html.Raw(fxrateList.RowAttributes)>
+    @* Render list options (body, left) *@
+    @fxrateList.ListOptions.RenderBody("left", fxrateList.RowCount)
+    @if (fxrateList.id.Visible) { // fxrateList.id.Visible (begin)
+        <td data-name="id" @Html.Raw(fxrateList.id.CellAttributes)>
+<span id="el@(fxrateList.RowCount)_fxrate_id" class="el_fxrate_id">
+<span @Html.Raw(fxrateList.id.ViewAttributes)>
+@Html.Raw(fxrateList.id.GetViewValue())</span>
+</span>
+</td>
+    } @* fxrateList.id.Visible (end) *@
+    @if (fxrateList.sourceCurrency.Visible) { // fxrateList.sourceCurrency.Visible (begin)
+        <td data-name="sourceCurrency" @Html.Raw(fxrateList.sourceCurrency.CellAttributes)>
+<span id="el@(fxrateList.RowCount)_fxrate_sourceCurrency" class="el_fxrate_sourceCurrency">
+<span @Html.Raw(fxrateList.sourceCurrency.ViewAttributes)>
+@Html.Raw(fxrateList.sourceCurrency.GetViewValue())</span>
+</span>
+</td>
+    } @* fxrateList.sourceCurrency.Visible (end) *@
+    @if (fxrateList.targetCurrency.Visible) { // fxrateList.targetCurrency.Visible (begin)
+        <td data-name="targetCurrency" @Html.Raw(fxrateList.targetCurrency.CellAttributes)>
+<span id="el@(fxrateList.RowCount)_fxrate_targetCurrency" class="el_fxrate_targetCurrency">
+<span @Html.Raw(fxrateList.targetCurrency.ViewAttributes)>
+@Html.Raw(fxrateList.targetCurrency.GetViewValue())</span>
+</span>
+</td>
+    } @* fxrateList.targetCurrency.Visible (end) *@
+    @if (fxrateList.rate.Visible) { // fxrateList.rate.Visible (begin)
+        <td data-name="rate" @Html.Raw(fxrateList.rate.CellAttributes)>
+<span id="el@(fxrateList.RowCount)_fxrate_rate" class="el_fxrate_rate">
+<span @Html.Raw(fxrateList.rate.ViewAttributes)>
+@Html.Raw(fxrateList.rate.GetViewValue())</span>
+</span>
+</td>
+    } @* fxrateList.rate.Visible (end) *@
+    @* Render list options (body, right) *@
+    @fxrateList.ListOptions.RenderBody("right", fxrateList.RowCount)
+    </tr>
+    } @* End if *@
+
+    // Reset for template row
+    if (SameString(fxrateList.RowIndex, "$rowindex$"))
+        fxrateList.RowIndex = 0;
+
+    // Reset inline add/copy row
+    if ((fxrateList.IsCopy || fxrateList.IsAdd) && fxrateList.RowIndex is int rowIndex2 && rowIndex2 == 0)
+        fxrateList.RowIndex = 1;
+} @* End While *@
+</tbody>
+</table><!-- /.ew-table -->
+} @* End If TotalRecords > 0 *@
+</div><!-- /.ew-grid-middle-panel -->
+@if (Empty(fxrateList.CurrentAction) && !fxrateList.UseAjaxActions) {
+<input type="hidden" name="action" id="action" value="">
+}
+</form><!-- /.ew-list-form -->
+@{ fxrateList.CloseRecordset(); }
+@if (!fxrateList.IsExport()) {
+<div class="card-footer ew-grid-lower-panel">
+@if (!fxrateList.IsGridAdd && !(fxrateList.IsGridEdit && fxrateList.ModalGridEdit) && !fxrateList.IsMultiEdit) {
+@Html.Raw(fxrateList.Pager.Render())
+}
+<div class="ew-list-other-options">
+@fxrateList.OtherOptions.RenderBody("bottom")
+</div>
+</div>
+}
+</div><!-- /.ew-grid -->
+} else { // Show other options
+<div class="ew-list-other-options">
+@fxrateList.OtherOptions.ForEach(opt => opt.ButtonClass = "").RenderBody()
+</div>
+}
+</div>
+</main>
+@fxrateList.ShowPageFooter()
+@Html.Raw(GetDebugMessage())
+@ElapsedTime()
+@if (!fxrateList.IsExport()) {
+<script>
+// Field event handlers
+loadjs.ready("head", function() {
+    ew.addEventHandlers("fxrate");
+});
+</script>
+<script>
+loadjs.ready("load", function() {
+    // Write your table-specific startup script here
+    // document.write("page loaded");
+});
+</script>
+}

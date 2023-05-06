@@ -1,0 +1,220 @@
+@{
+    // View
+    View = this;
+
+    // Check action result
+    if (productEdit.ActionResult is EmptyResult) { // Terminate page
+        return;
+    }
+
+    // Layout
+    if (!productEdit.UseLayout) // UseLayout = false // DN
+        Layout = "";
+    else
+        Layout = "_Layout";
+
+    // Local variables (Temp data)
+    #pragma warning disable 168
+    string? sqlWrk, filterWrk, whereWrk, curVal, dispVal;
+    List<Dictionary<string, object>>? rswrk;
+    string[]? arWrk;
+    List<object?>? listWrk;
+    object? guidWrk;
+    Func<string>? lookupFilter;
+    #pragma warning restore 168
+}
+<script>
+loadjs.ready("head", function() {
+    // Write your client script here, no need to add script tags.
+});
+</script>
+@productEdit.ShowPageHeader()
+@productEdit.ShowMessages()
+<main class="edit">
+<form name="fproductedit" id="fproductedit" class="@(productEdit.FormClassName)" action="@AppPath(CurrentPageName())" method="post" novalidate autocomplete="on">
+<script>
+var currentTable = @Html.Raw(ConvertToJson(productEdit.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { product: currentTable } });
+var currentPageID = ew.PAGE_ID = "edit";
+var currentForm;
+var fproductedit;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery;
+    let fields = currentTable.fields;
+
+    // Form object
+    let form = new ew.FormBuilder()
+        .setId("fproductedit")
+        .setPageId("edit")
+
+        // Add fields
+        .setFields([
+
+            ["productId", [fields.productId.visible && fields.productId.required ? ew.Validators.required(fields.productId.caption) : null], fields.productId.isInvalid],
+            ["_name", [fields._name.visible && fields._name.required ? ew.Validators.required(fields._name.caption) : null], fields._name.isInvalid],
+            ["description", [fields.description.visible && fields.description.required ? ew.Validators.required(fields.description.caption) : null], fields.description.isInvalid],
+            ["unitPrice", [fields.unitPrice.visible && fields.unitPrice.required ? ew.Validators.required(fields.unitPrice.caption) : null, ew.Validators.float], fields.unitPrice.isInvalid],
+            ["maximumQuantity", [fields.maximumQuantity.visible && fields.maximumQuantity.required ? ew.Validators.required(fields.maximumQuantity.caption) : null, ew.Validators.integer], fields.maximumQuantity.isInvalid]
+        ])
+
+        // Form_CustomValidate
+        .setCustomValidate(
+            function(fobj) { // DO NOT CHANGE THIS LINE!
+                    // Your custom validation code here, return false if invalid.
+                    return true;
+                }
+        )
+
+        // Use JavaScript validation or not
+        .setValidateRequired(ew.CLIENT_VALIDATE)
+
+        // Dynamic selection lists
+        .setLists({
+        })
+        .build();
+    window[form.id] = form;
+    currentForm = form;
+    loadjs.done(form.id);
+});
+</script>
+@if (CurrentPage.CheckToken) {
+    <input type="hidden" name="@Config.TokenNameKey" value="@Config.TokenName"><!-- CSRF token name -->
+    @Html.AntiForgeryToken()
+}
+@if (productEdit.IsConfirm) { // Confirm page
+<input type="hidden" name="action" id="action" value="update">
+<input type="hidden" name="confirm" id="confirm" value="confirm">
+} else {
+<input type="hidden" name="action" id="action" value="confirm">
+}
+<input type="hidden" name="modal" value="@ConvertToInt(productEdit.IsModal)">
+@if (IsJsonResponse()) {
+<input type="hidden" name="json" value="1">
+}
+<input type="hidden" name="@(productEdit.OldKeyName)" value="@Html.Raw(productEdit.OldKey)">
+<div class="ew-edit-div"><!-- page* -->
+@if (productEdit.productId.Visible) { // productEdit.productId.Visible (begin)
+    <div id="r_productId" @Html.Raw(productEdit.productId.RowAttributes)>
+        <label id="elh_product_productId" for="x_productId" class="@(productEdit.LeftColumnClass)">@Html.Raw(productEdit.productId.Caption)@Html.Raw(productEdit.productId.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(productEdit.RightColumnClass)"><div @Html.Raw(productEdit.productId.CellAttributes)>
+@if (!productEdit.IsConfirm) { // productId (begin)
+<span id="el_product_productId">
+<input type="@(productEdit.productId.InputTextType)" name="x_productId" id="x_productId" data-table="product" data-field="x_productId" value="@Html.Raw(productEdit.productId.EditValue)" size="30" maxlength="50" placeholder="@Html.Raw(HtmlEncode(productEdit.productId.PlaceHolder))" data-format-pattern="@(productEdit.productId.FormatPattern)"@Html.Raw(productEdit.productId.EditAttributes) aria-describedby="x_productId_help">
+@Html.Raw(productEdit.productId.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(productEdit.productId.GetErrorMessage())</div>
+<input type="hidden" data-table="product" data-field="x_productId" data-hidden="1" data-old name="o_productId" id="o_productId" value="@Html.Raw(HtmlEncode(productEdit.productId.OldValue ?? productEdit.productId.CurrentValue))">
+</span>
+} else { // productId (confirm)
+<span @Html.Raw(productEdit.productId.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(productEdit.productId.ViewValue)))"></span>
+<input type="hidden" data-table="product" data-field="x_productId" data-hidden="1" name="x_productId" id="x_productId" value="@Html.Raw(HtmlEncode(productEdit.productId.FormValue))">
+} @* productId (end) *@
+</div></div>
+    </div>
+} @* productEdit.productId.Visible (end) *@
+@if (productEdit._name.Visible) { // productEdit._name.Visible (begin)
+    <div id="r__name" @Html.Raw(productEdit._name.RowAttributes)>
+        <label id="elh_product__name" for="x__name" class="@(productEdit.LeftColumnClass)">@Html.Raw(productEdit._name.Caption)@Html.Raw(productEdit._name.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(productEdit.RightColumnClass)"><div @Html.Raw(productEdit._name.CellAttributes)>
+@if (!productEdit.IsConfirm) { // _name (begin)
+<span id="el_product__name">
+<input type="@(productEdit._name.InputTextType)" name="x__name" id="x__name" data-table="product" data-field="x__name" value="@Html.Raw(productEdit._name.EditValue)" size="30" maxlength="200" placeholder="@Html.Raw(HtmlEncode(productEdit._name.PlaceHolder))" data-format-pattern="@(productEdit._name.FormatPattern)"@Html.Raw(productEdit._name.EditAttributes) aria-describedby="x__name_help">
+@Html.Raw(productEdit._name.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(productEdit._name.GetErrorMessage())</div>
+</span>
+} else { // _name (confirm)
+<span @Html.Raw(productEdit._name.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(productEdit._name.ViewValue)))"></span>
+<input type="hidden" data-table="product" data-field="x__name" data-hidden="1" name="x__name" id="x__name" value="@Html.Raw(HtmlEncode(productEdit._name.FormValue))">
+} @* _name (end) *@
+</div></div>
+    </div>
+} @* productEdit._name.Visible (end) *@
+@if (productEdit.description.Visible) { // productEdit.description.Visible (begin)
+    <div id="r_description" @Html.Raw(productEdit.description.RowAttributes)>
+        <label id="elh_product_description" for="x_description" class="@(productEdit.LeftColumnClass)">@Html.Raw(productEdit.description.Caption)@Html.Raw(productEdit.description.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(productEdit.RightColumnClass)"><div @Html.Raw(productEdit.description.CellAttributes)>
+@if (!productEdit.IsConfirm) { // description (begin)
+<span id="el_product_description">
+<input type="@(productEdit.description.InputTextType)" name="x_description" id="x_description" data-table="product" data-field="x_description" value="@Html.Raw(productEdit.description.EditValue)" size="30" maxlength="250" placeholder="@Html.Raw(HtmlEncode(productEdit.description.PlaceHolder))" data-format-pattern="@(productEdit.description.FormatPattern)"@Html.Raw(productEdit.description.EditAttributes) aria-describedby="x_description_help">
+@Html.Raw(productEdit.description.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(productEdit.description.GetErrorMessage())</div>
+</span>
+} else { // description (confirm)
+<span @Html.Raw(productEdit.description.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(productEdit.description.ViewValue)))"></span>
+<input type="hidden" data-table="product" data-field="x_description" data-hidden="1" name="x_description" id="x_description" value="@Html.Raw(HtmlEncode(productEdit.description.FormValue))">
+} @* description (end) *@
+</div></div>
+    </div>
+} @* productEdit.description.Visible (end) *@
+@if (productEdit.unitPrice.Visible) { // productEdit.unitPrice.Visible (begin)
+    <div id="r_unitPrice" @Html.Raw(productEdit.unitPrice.RowAttributes)>
+        <label id="elh_product_unitPrice" for="x_unitPrice" class="@(productEdit.LeftColumnClass)">@Html.Raw(productEdit.unitPrice.Caption)@Html.Raw(productEdit.unitPrice.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(productEdit.RightColumnClass)"><div @Html.Raw(productEdit.unitPrice.CellAttributes)>
+@if (!productEdit.IsConfirm) { // unitPrice (begin)
+<span id="el_product_unitPrice">
+<input type="@(productEdit.unitPrice.InputTextType)" name="x_unitPrice" id="x_unitPrice" data-table="product" data-field="x_unitPrice" value="@Html.Raw(productEdit.unitPrice.EditValue)" size="30" placeholder="@Html.Raw(HtmlEncode(productEdit.unitPrice.PlaceHolder))" data-format-pattern="@(productEdit.unitPrice.FormatPattern)"@Html.Raw(productEdit.unitPrice.EditAttributes) aria-describedby="x_unitPrice_help">
+@Html.Raw(productEdit.unitPrice.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(productEdit.unitPrice.GetErrorMessage())</div>
+</span>
+} else { // unitPrice (confirm)
+<span @Html.Raw(productEdit.unitPrice.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(productEdit.unitPrice.ViewValue)))"></span>
+<input type="hidden" data-table="product" data-field="x_unitPrice" data-hidden="1" name="x_unitPrice" id="x_unitPrice" value="@Html.Raw(HtmlEncode(productEdit.unitPrice.FormValue))">
+} @* unitPrice (end) *@
+</div></div>
+    </div>
+} @* productEdit.unitPrice.Visible (end) *@
+@if (productEdit.maximumQuantity.Visible) { // productEdit.maximumQuantity.Visible (begin)
+    <div id="r_maximumQuantity" @Html.Raw(productEdit.maximumQuantity.RowAttributes)>
+        <label id="elh_product_maximumQuantity" for="x_maximumQuantity" class="@(productEdit.LeftColumnClass)">@Html.Raw(productEdit.maximumQuantity.Caption)@Html.Raw(productEdit.maximumQuantity.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(productEdit.RightColumnClass)"><div @Html.Raw(productEdit.maximumQuantity.CellAttributes)>
+@if (!productEdit.IsConfirm) { // maximumQuantity (begin)
+<span id="el_product_maximumQuantity">
+<input type="@(productEdit.maximumQuantity.InputTextType)" name="x_maximumQuantity" id="x_maximumQuantity" data-table="product" data-field="x_maximumQuantity" value="@Html.Raw(productEdit.maximumQuantity.EditValue)" size="30" placeholder="@Html.Raw(HtmlEncode(productEdit.maximumQuantity.PlaceHolder))" data-format-pattern="@(productEdit.maximumQuantity.FormatPattern)"@Html.Raw(productEdit.maximumQuantity.EditAttributes) aria-describedby="x_maximumQuantity_help">
+@Html.Raw(productEdit.maximumQuantity.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(productEdit.maximumQuantity.GetErrorMessage())</div>
+</span>
+} else { // maximumQuantity (confirm)
+<span @Html.Raw(productEdit.maximumQuantity.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(productEdit.maximumQuantity.ViewValue)))"></span>
+<input type="hidden" data-table="product" data-field="x_maximumQuantity" data-hidden="1" name="x_maximumQuantity" id="x_maximumQuantity" value="@Html.Raw(HtmlEncode(productEdit.maximumQuantity.FormValue))">
+} @* maximumQuantity (end) *@
+</div></div>
+    </div>
+} @* productEdit.maximumQuantity.Visible (end) *@
+</div><!-- /page* -->
+@{ productEdit.CloseRecordset(); }
+@Html.Raw(productEdit.IsModal ? "<template class=\"ew-modal-buttons\">" : "<div class=\"row ew-buttons\">")<!-- buttons .row -->
+    <div class="@(productEdit.OffsetColumnClass)"><!-- buttons offset -->
+@if (!productEdit.IsConfirm) { // Confirm page
+    <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fproductedit" data-ew-action="set-action" data-value="confirm">@Html.Raw(Language.Phrase("SaveBtn"))</button>
+@if (IsJsonResponse()) {
+    <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-bs-dismiss="modal">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+} else {
+    <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" form="fproductedit" data-href="@AppPath(productEdit.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+}
+} else {
+    <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fproductedit">@Html.Raw(Language.Phrase("ConfirmBtn"))</button>
+    <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="submit" form="fproductedit" data-ew-action="set-action" data-value="cancel">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+}
+    </div><!-- /buttons offset -->
+@Html.Raw(productEdit.IsModal ? "</template>" : "</div>")<!-- /buttons .row -->
+</form>
+</main>
+@productEdit.ShowPageFooter()
+@Html.Raw(GetDebugMessage())
+@ElapsedTime()
+<script>
+// Field event handlers
+loadjs.ready("head", function() {
+    ew.addEventHandlers("product");
+});
+</script>
+<script>
+loadjs.ready("load", function() {
+    // Write your table-specific startup script here
+    // document.write("page loaded");
+});
+</script>

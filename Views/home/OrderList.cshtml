@@ -1,0 +1,279 @@
+@{
+    // View
+    View = this;
+
+    // Check action result
+    if (orderList.ActionResult is EmptyResult) { // Terminate page
+        return;
+    }
+
+    // Layout
+    if (!orderList.UseLayout) // UseLayout = false // DN
+        Layout = "";
+    else
+        Layout = "_Layout";
+
+    // Local variables (Temp data)
+    #pragma warning disable 168
+    string? sqlWrk, filterWrk, whereWrk, curVal, dispVal;
+    List<Dictionary<string, object>>? rswrk;
+    string[]? arWrk;
+    List<object?>? listWrk;
+    object? guidWrk;
+    Func<string>? lookupFilter;
+    #pragma warning restore 168
+}
+@if (!orderList.IsExport()) {
+<script>
+var currentTable = @Html.Raw(ConvertToJson(orderList.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { order: currentTable } });
+var currentPageID = ew.PAGE_ID = "list";
+var currentForm;
+var @(orderList.FormName);
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery;
+    let fields = currentTable.fields;
+
+    // Form object
+    let form = new ew.FormBuilder()
+        .setId("@(orderList.FormName)")
+        .setPageId("list")
+        .setSubmitWithFetch(@(orderList.UseAjaxActions ? "true" : "false"))
+        .setFormKeyCountName("@(orderList.FormKeyCountName)")
+        .build();
+    window[form.id] = form;
+    currentForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<script>
+loadjs.ready("head", function() {
+    // Write your client script here, no need to add script tags.
+});
+</script>
+}
+@if (!orderList.IsExport()) {
+<div class="btn-toolbar ew-toolbar">
+@if (orderList.TotalRecords > 0 && orderList.ExportOptions.Visible) {
+    orderList.ExportOptions.Render("body");
+}
+@if (orderList.ImportOptions.Visible) {
+    orderList.ImportOptions.Render("body");
+}
+@if (orderList.SearchOptions.Visible) {
+    orderList.SearchOptions.Render("body");
+}
+@if (orderList.FilterOptions.Visible) {
+    orderList.FilterOptions.Render("body");
+}
+</div>
+}
+@if (!orderList.IsModal) {
+<form name="fordersrch" id="fordersrch" class="ew-form ew-ext-search-form" action="@AppPath(CurrentPageName())" novalidate autocomplete="on">
+<div id="fordersrch_search_panel" class="mb-2 mb-sm-0 @(orderList.SearchPanelClass)"><!-- .ew-search-panel -->
+<script>
+var currentTable = @Html.Raw(ConvertToJson(orderList.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { order: currentTable } });
+var currentForm;
+var fordersrch, currentSearchForm, currentAdvancedSearchForm;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery,
+        fields = currentTable.fields;
+
+    // Form object for search
+    let form = new ew.FormBuilder()
+        .setId("fordersrch")
+        .setPageId("list")
+@if (orderList.UseAjaxActions) {
+        <text>.setSubmitWithFetch(true)</text>
+}
+
+        // Dynamic selection lists
+        .setLists({
+        })
+
+        // Filters
+        .setFilterList(@Html.Raw(await orderList.GetFilterList()))
+        .build();
+    window[form.id] = form;
+    currentSearchForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<input type="hidden" name="cmd" value="search">
+@if (!orderList.IsExport() && Empty(orderList.CurrentAction) && orderList.HasSearchFields()) { @* Show search form (begin) *@
+<div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0">
+    <div class="col-sm-auto px-0 pe-sm-2">
+        <div class="ew-basic-search input-group">
+            <input type="search" name="@(Config.TableBasicSearch)" id="@(Config.TableBasicSearch)" class="form-control ew-basic-search-keyword" value="@Html.Raw(HtmlEncode(orderList.BasicSearch.SessionKeyword))" placeholder="@(HtmlEncode(Language.Phrase("Search")))" aria-label="@(HtmlEncode(Language.Phrase("Search")))">
+            <input type="hidden" name="@(Config.TableBasicSearchType)" id="@(Config.TableBasicSearchType)" class="ew-basic-search-type" value="@(HtmlEncode(orderList.BasicSearch.SessionType))">
+            <button type="button" data-bs-toggle="dropdown" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false">
+                <span id="searchtype">@Html.Raw(orderList.BasicSearch.TypeNameShort)</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+                <button type="button" class="dropdown-item@(orderList.BasicSearch.SessionType == "" ? " active" : "")" form="fordersrch" data-ew-action="search-type">@Html.Raw(Language.Phrase("QuickSearchAuto"))</button>
+                <button type="button" class="dropdown-item@(orderList.BasicSearch.SessionType == "=" ? " active" : "")" form="fordersrch" data-ew-action="search-type" data-search-type="=">@Html.Raw(Language.Phrase("QuickSearchExact"))</button>
+                <button type="button" class="dropdown-item@(orderList.BasicSearch.SessionType == "AND" ? " active" : "")" form="fordersrch" data-ew-action="search-type" data-search-type="AND">@Html.Raw(Language.Phrase("QuickSearchAll"))</button>
+                <button type="button" class="dropdown-item@(orderList.BasicSearch.SessionType == "OR" ? " active" : "")" form="fordersrch" data-ew-action="search-type" data-search-type="OR">@Html.Raw(Language.Phrase("QuickSearchAny"))</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-auto mb-3">
+        <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit">@Html.Raw(Language.Phrase("SearchBtn"))</button>
+    </div>
+</div>
+</div><!-- /.ew-extended-search -->
+} @* Show search form (end) *@
+</div><!-- /.ew-search-panel -->
+</form>
+}
+@orderList.ShowPageHeader()
+@orderList.ShowMessages()
+<main class="list @(orderList.TotalRecords == 0 && !orderList.IsAdd ? " ew-no-record" : "")">
+<div id="ew-list">
+@if (orderList.TotalRecords > 0 || !Empty(orderList.CurrentAction)) {
+<div class="card ew-card ew-grid@(orderList.IsAddOrEdit ? " ew-grid-add-edit" : "") @(orderList.TableGridClass)">
+<form name="@(orderList.FormName)" id="@(orderList.FormName)" class="ew-form ew-list-form" action="@AppPath(orderList.PageName)" method="post" novalidate autocomplete="on">
+@if (CurrentPage.CheckToken) {
+    <input type="hidden" name="@Config.TokenNameKey" value="@Config.TokenName"><!-- CSRF token name -->
+    @Html.AntiForgeryToken()
+}
+@if (orderList.IsModal) {
+<input type="hidden" name="modal" value="1">
+}
+<div id="gmp_order" class="card-body ew-grid-middle-panel @(orderList.TableContainerClass)" style="@(orderList.TableContainerStyle)">
+@if (orderList.TotalRecords > 0 || orderList.IsGridEdit || orderList.IsMultiEdit) {
+<table id="tbl_orderlist" class="@(orderList.TableClass)"><!-- .ew-table -->
+<thead>
+    <tr class="ew-table-header">
+@{
+    // Header row
+    orderList.RowType = RowType.Header;
+
+    // Render list options
+    await orderList.RenderListOptions();
+}
+@* Render list options (header, left) *@
+@orderList.ListOptions.RenderHeader("left")
+@if (orderList.customerID.Visible) { // orderList.customerID.Visible (begin)
+        <th data-name="customerID" class="@(orderList.customerID.HeaderCellClass)"><div id="elh_order_customerID" class="order_customerID">@Html.Raw(orderList.RenderFieldHeader(orderList.customerID))</div></th>
+} @* orderList.customerID.Visible (end) *@
+@if (orderList.customerName.Visible) { // orderList.customerName.Visible (begin)
+        <th data-name="customerName" class="@(orderList.customerName.HeaderCellClass)"><div id="elh_order_customerName" class="order_customerName">@Html.Raw(orderList.RenderFieldHeader(orderList.customerName))</div></th>
+} @* orderList.customerName.Visible (end) *@
+@if (orderList.customerEmail.Visible) { // orderList.customerEmail.Visible (begin)
+        <th data-name="customerEmail" class="@(orderList.customerEmail.HeaderCellClass)"><div id="elh_order_customerEmail" class="order_customerEmail">@Html.Raw(orderList.RenderFieldHeader(orderList.customerEmail))</div></th>
+} @* orderList.customerEmail.Visible (end) *@
+@if (orderList.lineItems.Visible) { // orderList.lineItems.Visible (begin)
+        <th data-name="lineItems" class="@(orderList.lineItems.HeaderCellClass)"><div id="elh_order_lineItems" class="order_lineItems">@Html.Raw(orderList.RenderFieldHeader(orderList.lineItems))</div></th>
+} @* orderList.lineItems.Visible (end) *@
+@* Render list options (header, right) *@
+@orderList.ListOptions.RenderHeader("right")
+    </tr>
+</thead>
+<tbody data-page="@(orderList.PageNumber)">
+@{
+    await orderList.SetupGrid();
+    bool eof = orderList.Recordset == null; // DN
+}
+@while (orderList.RecordCount < orderList.StopRecord || SameString(orderList.RowIndex, "$rowindex$")) { // Begin While
+    if (!eof && !SameString(orderList.RowIndex, "$rowindex$") &&
+        (!orderList.IsGridAdd || orderList.CurrentMode == "copy") &&
+        (!((orderList.IsCopy || orderList.IsAdd) && orderList.RowIndex is int rowIndex && rowIndex == 0))) // DN
+        eof = !await orderList.Recordset.ReadAsync();
+    orderList.RecordCount++;
+    if (orderList.RecordCount >= orderList.StartRecord) {
+        await orderList.SetupRow();
+    <tr @Html.Raw(orderList.RowAttributes)>
+    @* Render list options (body, left) *@
+    @orderList.ListOptions.RenderBody("left", orderList.RowCount)
+    @if (orderList.customerID.Visible) { // orderList.customerID.Visible (begin)
+        <td data-name="customerID" @Html.Raw(orderList.customerID.CellAttributes)>
+<span id="el@(orderList.RowCount)_order_customerID" class="el_order_customerID">
+<span @Html.Raw(orderList.customerID.ViewAttributes)>
+@Html.Raw(orderList.customerID.GetViewValue())</span>
+</span>
+</td>
+    } @* orderList.customerID.Visible (end) *@
+    @if (orderList.customerName.Visible) { // orderList.customerName.Visible (begin)
+        <td data-name="customerName" @Html.Raw(orderList.customerName.CellAttributes)>
+<span id="el@(orderList.RowCount)_order_customerName" class="el_order_customerName">
+<span @Html.Raw(orderList.customerName.ViewAttributes)>
+@Html.Raw(orderList.customerName.GetViewValue())</span>
+</span>
+</td>
+    } @* orderList.customerName.Visible (end) *@
+    @if (orderList.customerEmail.Visible) { // orderList.customerEmail.Visible (begin)
+        <td data-name="customerEmail" @Html.Raw(orderList.customerEmail.CellAttributes)>
+<span id="el@(orderList.RowCount)_order_customerEmail" class="el_order_customerEmail">
+<span @Html.Raw(orderList.customerEmail.ViewAttributes)>
+@Html.Raw(orderList.customerEmail.GetViewValue())</span>
+</span>
+</td>
+    } @* orderList.customerEmail.Visible (end) *@
+    @if (orderList.lineItems.Visible) { // orderList.lineItems.Visible (begin)
+        <td data-name="lineItems" @Html.Raw(orderList.lineItems.CellAttributes)>
+<span id="el@(orderList.RowCount)_order_lineItems" class="el_order_lineItems">
+<span @Html.Raw(orderList.lineItems.ViewAttributes)>
+@Html.Raw(orderList.lineItems.GetViewValue())</span>
+</span>
+</td>
+    } @* orderList.lineItems.Visible (end) *@
+    @* Render list options (body, right) *@
+    @orderList.ListOptions.RenderBody("right", orderList.RowCount)
+    </tr>
+    } @* End if *@
+
+    // Reset for template row
+    if (SameString(orderList.RowIndex, "$rowindex$"))
+        orderList.RowIndex = 0;
+
+    // Reset inline add/copy row
+    if ((orderList.IsCopy || orderList.IsAdd) && orderList.RowIndex is int rowIndex2 && rowIndex2 == 0)
+        orderList.RowIndex = 1;
+} @* End While *@
+</tbody>
+</table><!-- /.ew-table -->
+} @* End If TotalRecords > 0 *@
+</div><!-- /.ew-grid-middle-panel -->
+@if (Empty(orderList.CurrentAction) && !orderList.UseAjaxActions) {
+<input type="hidden" name="action" id="action" value="">
+}
+</form><!-- /.ew-list-form -->
+@{ orderList.CloseRecordset(); }
+@if (!orderList.IsExport()) {
+<div class="card-footer ew-grid-lower-panel">
+@if (!orderList.IsGridAdd && !(orderList.IsGridEdit && orderList.ModalGridEdit) && !orderList.IsMultiEdit) {
+@Html.Raw(orderList.Pager.Render())
+}
+<div class="ew-list-other-options">
+@orderList.OtherOptions.RenderBody("bottom")
+</div>
+</div>
+}
+</div><!-- /.ew-grid -->
+} else { // Show other options
+<div class="ew-list-other-options">
+@orderList.OtherOptions.ForEach(opt => opt.ButtonClass = "").RenderBody()
+</div>
+}
+</div>
+</main>
+@orderList.ShowPageFooter()
+@Html.Raw(GetDebugMessage())
+@ElapsedTime()
+@if (!orderList.IsExport()) {
+<script>
+// Field event handlers
+loadjs.ready("head", function() {
+    ew.addEventHandlers("order");
+});
+</script>
+<script>
+loadjs.ready("load", function() {
+    // Write your table-specific startup script here
+    // document.write("page loaded");
+});
+</script>
+}

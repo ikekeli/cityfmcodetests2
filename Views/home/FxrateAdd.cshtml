@@ -1,0 +1,185 @@
+@{
+    // View
+    View = this;
+
+    // Check action result
+    if (fxrateAdd.ActionResult is EmptyResult) { // Terminate page
+        return;
+    }
+
+    // Layout
+    if (!fxrateAdd.UseLayout) // UseLayout = false // DN
+        Layout = "";
+    else
+        Layout = "_Layout";
+
+    // Local variables (Temp data)
+    #pragma warning disable 168
+    string? sqlWrk, filterWrk, whereWrk, curVal, dispVal;
+    List<Dictionary<string, object>>? rswrk;
+    string[]? arWrk;
+    List<object?>? listWrk;
+    object? guidWrk;
+    Func<string>? lookupFilter;
+    #pragma warning restore 168
+}
+<script>
+var currentTable = @Html.Raw(ConvertToJson(fxrateAdd.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { fxrate: currentTable } });
+var currentPageID = ew.PAGE_ID = "add";
+var currentForm;
+var ffxrateadd;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery;
+    let fields = currentTable.fields;
+
+    // Form object
+    let form = new ew.FormBuilder()
+        .setId("ffxrateadd")
+        .setPageId("add")
+
+        // Add fields
+        .setFields([
+
+            ["sourceCurrency", [fields.sourceCurrency.visible && fields.sourceCurrency.required ? ew.Validators.required(fields.sourceCurrency.caption) : null], fields.sourceCurrency.isInvalid],
+            ["targetCurrency", [fields.targetCurrency.visible && fields.targetCurrency.required ? ew.Validators.required(fields.targetCurrency.caption) : null], fields.targetCurrency.isInvalid],
+            ["rate", [fields.rate.visible && fields.rate.required ? ew.Validators.required(fields.rate.caption) : null, ew.Validators.float], fields.rate.isInvalid]
+        ])
+
+        // Form_CustomValidate
+        .setCustomValidate(
+            function(fobj) { // DO NOT CHANGE THIS LINE!
+                    // Your custom validation code here, return false if invalid.
+                    return true;
+                }
+        )
+
+        // Use JavaScript validation or not
+        .setValidateRequired(ew.CLIENT_VALIDATE)
+
+        // Dynamic selection lists
+        .setLists({
+        })
+        .build();
+    window[form.id] = form;
+    currentForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<script>
+loadjs.ready("head", function() {
+    // Write your client script here, no need to add script tags.
+});
+</script>
+@fxrateAdd.ShowPageHeader()
+@fxrateAdd.ShowMessages()
+<form name="ffxrateadd" id="ffxrateadd" class="@(fxrateAdd.FormClassName)" action="@AppPath(CurrentPageName())" method="post" novalidate autocomplete="on">
+@if (CurrentPage.CheckToken) {
+    <input type="hidden" name="@Config.TokenNameKey" value="@Config.TokenName"><!-- CSRF token name -->
+    @Html.AntiForgeryToken()
+}
+@if (fxrateAdd.IsConfirm) { // Confirm page
+<input type="hidden" name="action" id="action" value="insert">
+<input type="hidden" name="confirm" id="confirm" value="confirm">
+} else {
+<input type="hidden" name="action" id="action" value="confirm">
+}
+<input type="hidden" name="modal" value="@ConvertToInt(fxrateAdd.IsModal)">
+@if (IsJsonResponse()) {
+<input type="hidden" name="json" value="1">
+}
+<input type="hidden" name="@(fxrateAdd.OldKeyName)" value="@Html.Raw(fxrateAdd.OldKey)">
+<div class="ew-add-div"><!-- page* -->
+@if (fxrateAdd.sourceCurrency.Visible) { // fxrateAdd.sourceCurrency.Visible (begin)
+    <div id="r_sourceCurrency" @Html.Raw(fxrateAdd.sourceCurrency.RowAttributes)>
+        <label id="elh_fxrate_sourceCurrency" for="x_sourceCurrency" class="@(fxrateAdd.LeftColumnClass)">@Html.Raw(fxrateAdd.sourceCurrency.Caption)@Html.Raw(fxrateAdd.sourceCurrency.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(fxrateAdd.RightColumnClass)"><div @Html.Raw(fxrateAdd.sourceCurrency.CellAttributes)>
+@if (!fxrateAdd.IsConfirm) { // sourceCurrency (begin)
+<span id="el_fxrate_sourceCurrency">
+<input type="@(fxrateAdd.sourceCurrency.InputTextType)" name="x_sourceCurrency" id="x_sourceCurrency" data-table="fxrate" data-field="x_sourceCurrency" value="@Html.Raw(fxrateAdd.sourceCurrency.EditValue)" size="30" maxlength="250" placeholder="@Html.Raw(HtmlEncode(fxrateAdd.sourceCurrency.PlaceHolder))" data-format-pattern="@(fxrateAdd.sourceCurrency.FormatPattern)"@Html.Raw(fxrateAdd.sourceCurrency.EditAttributes) aria-describedby="x_sourceCurrency_help">
+@Html.Raw(fxrateAdd.sourceCurrency.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(fxrateAdd.sourceCurrency.GetErrorMessage())</div>
+</span>
+} else { // sourceCurrency (confirm)
+<span id="el_fxrate_sourceCurrency">
+<span @Html.Raw(fxrateAdd.sourceCurrency.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(fxrateAdd.sourceCurrency.ViewValue)))"></span>
+<input type="hidden" data-table="fxrate" data-field="x_sourceCurrency" data-hidden="1" name="x_sourceCurrency" id="x_sourceCurrency" value="@Html.Raw(HtmlEncode(fxrateAdd.sourceCurrency.FormValue))">
+</span>
+} @* sourceCurrency (end) *@
+</div></div>
+    </div>
+} @* fxrateAdd.sourceCurrency.Visible (end) *@
+@if (fxrateAdd.targetCurrency.Visible) { // fxrateAdd.targetCurrency.Visible (begin)
+    <div id="r_targetCurrency" @Html.Raw(fxrateAdd.targetCurrency.RowAttributes)>
+        <label id="elh_fxrate_targetCurrency" for="x_targetCurrency" class="@(fxrateAdd.LeftColumnClass)">@Html.Raw(fxrateAdd.targetCurrency.Caption)@Html.Raw(fxrateAdd.targetCurrency.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(fxrateAdd.RightColumnClass)"><div @Html.Raw(fxrateAdd.targetCurrency.CellAttributes)>
+@if (!fxrateAdd.IsConfirm) { // targetCurrency (begin)
+<span id="el_fxrate_targetCurrency">
+<input type="@(fxrateAdd.targetCurrency.InputTextType)" name="x_targetCurrency" id="x_targetCurrency" data-table="fxrate" data-field="x_targetCurrency" value="@Html.Raw(fxrateAdd.targetCurrency.EditValue)" size="30" maxlength="250" placeholder="@Html.Raw(HtmlEncode(fxrateAdd.targetCurrency.PlaceHolder))" data-format-pattern="@(fxrateAdd.targetCurrency.FormatPattern)"@Html.Raw(fxrateAdd.targetCurrency.EditAttributes) aria-describedby="x_targetCurrency_help">
+@Html.Raw(fxrateAdd.targetCurrency.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(fxrateAdd.targetCurrency.GetErrorMessage())</div>
+</span>
+} else { // targetCurrency (confirm)
+<span id="el_fxrate_targetCurrency">
+<span @Html.Raw(fxrateAdd.targetCurrency.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(fxrateAdd.targetCurrency.ViewValue)))"></span>
+<input type="hidden" data-table="fxrate" data-field="x_targetCurrency" data-hidden="1" name="x_targetCurrency" id="x_targetCurrency" value="@Html.Raw(HtmlEncode(fxrateAdd.targetCurrency.FormValue))">
+</span>
+} @* targetCurrency (end) *@
+</div></div>
+    </div>
+} @* fxrateAdd.targetCurrency.Visible (end) *@
+@if (fxrateAdd.rate.Visible) { // fxrateAdd.rate.Visible (begin)
+    <div id="r_rate" @Html.Raw(fxrateAdd.rate.RowAttributes)>
+        <label id="elh_fxrate_rate" for="x_rate" class="@(fxrateAdd.LeftColumnClass)">@Html.Raw(fxrateAdd.rate.Caption)@Html.Raw(fxrateAdd.rate.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(fxrateAdd.RightColumnClass)"><div @Html.Raw(fxrateAdd.rate.CellAttributes)>
+@if (!fxrateAdd.IsConfirm) { // rate (begin)
+<span id="el_fxrate_rate">
+<input type="@(fxrateAdd.rate.InputTextType)" name="x_rate" id="x_rate" data-table="fxrate" data-field="x_rate" value="@Html.Raw(fxrateAdd.rate.EditValue)" size="30" placeholder="@Html.Raw(HtmlEncode(fxrateAdd.rate.PlaceHolder))" data-format-pattern="@(fxrateAdd.rate.FormatPattern)"@Html.Raw(fxrateAdd.rate.EditAttributes) aria-describedby="x_rate_help">
+@Html.Raw(fxrateAdd.rate.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(fxrateAdd.rate.GetErrorMessage())</div>
+</span>
+} else { // rate (confirm)
+<span id="el_fxrate_rate">
+<span @Html.Raw(fxrateAdd.rate.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(fxrateAdd.rate.ViewValue)))"></span>
+<input type="hidden" data-table="fxrate" data-field="x_rate" data-hidden="1" name="x_rate" id="x_rate" value="@Html.Raw(HtmlEncode(fxrateAdd.rate.FormValue))">
+</span>
+} @* rate (end) *@
+</div></div>
+    </div>
+} @* fxrateAdd.rate.Visible (end) *@
+</div><!-- /page* -->
+@{ fxrateAdd.CloseRecordset(); }
+@Html.Raw(fxrateAdd.IsModal ? "<template class=\"ew-modal-buttons\">" : "<div class=\"row ew-buttons\">")<!-- buttons .row -->
+    <div class="@(fxrateAdd.OffsetColumnClass)"><!-- buttons offset -->
+@if (!fxrateAdd.IsConfirm) { // Confirm page
+    <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="ffxrateadd" data-ew-action="set-action" data-value="confirm">@Html.Raw(Language.Phrase("AddBtn"))</button>
+@if (IsJsonResponse()) {
+    <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-bs-dismiss="modal">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+} else {
+    <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" form="ffxrateadd" data-href="@AppPath(fxrateAdd.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+}
+} else {
+    <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="ffxrateadd">@Html.Raw(Language.Phrase("ConfirmBtn"))</button>
+    <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="submit" form="ffxrateadd" data-ew-action="set-action" data-value="cancel">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+}
+    </div><!-- /buttons offset -->
+@Html.Raw(fxrateAdd.IsModal ? "</template>" : "</div>")<!-- /buttons .row -->
+</form>
+@fxrateAdd.ShowPageFooter()
+@Html.Raw(GetDebugMessage())
+@ElapsedTime()
+<script>
+// Field event handlers
+loadjs.ready("head", function() {
+    ew.addEventHandlers("fxrate");
+});
+</script>
+<script>
+loadjs.ready("load", function() {
+    // Write your table-specific startup script here
+    // document.write("page loaded");
+});
+</script>

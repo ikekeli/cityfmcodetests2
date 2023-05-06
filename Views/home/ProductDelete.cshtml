@@ -1,0 +1,155 @@
+@{
+    // View
+    View = this;
+
+    // Check action result
+    if (productDelete.ActionResult is EmptyResult) { // Terminate page
+        return;
+    }
+
+    // Layout
+    if (!productDelete.UseLayout) // UseLayout = false // DN
+        Layout = "";
+    else
+        Layout = "_Layout";
+
+    // Local variables (Temp data)
+    #pragma warning disable 168
+    string? sqlWrk, filterWrk, whereWrk, curVal, dispVal;
+    List<Dictionary<string, object>>? rswrk;
+    string[]? arWrk;
+    List<object?>? listWrk;
+    object? guidWrk;
+    Func<string>? lookupFilter;
+    #pragma warning restore 168
+}
+<script>
+var currentTable = @Html.Raw(ConvertToJson(productDelete.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { product: currentTable } });
+var currentPageID = ew.PAGE_ID = "delete";
+var currentForm;
+var fproductdelete;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery;
+    let fields = currentTable.fields;
+
+    // Form object
+    let form = new ew.FormBuilder()
+        .setId("fproductdelete")
+        .setPageId("delete")
+        .build();
+    window[form.id] = form;
+    currentForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<script>
+loadjs.ready("head", function() {
+    // Write your client script here, no need to add script tags.
+});
+</script>
+@productDelete.ShowPageHeader()
+@productDelete.ShowMessages()
+<form name="fproductdelete" id="fproductdelete" class="ew-form ew-delete-form" action="@AppPath(CurrentPageName())" method="post" novalidate autocomplete="on">
+@if (CurrentPage.CheckToken) {
+    <input type="hidden" name="@Config.TokenNameKey" value="@Config.TokenName"><!-- CSRF token name -->
+    @Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="delete">
+@foreach (string key in productDelete.RecordKeys) {
+<input type="hidden" name="key_m[]" value="@key">
+}
+<div class="card ew-card ew-grid @(productDelete.TableGridClass)">
+<div class="card-body ew-grid-middle-panel @(productDelete.TableContainerClass)" style="@(productDelete.TableContainerStyle)">
+<table class="@(productDelete.TableClass)">
+    <thead>
+    <tr class="ew-table-header">
+@if (productDelete.productId.Visible) { // productDelete.productId.Visible (begin)
+        <th class="@Html.Raw(productDelete.productId.HeaderCellClass)"><span id="elh_product_productId" class="product_productId">@Html.Raw(productDelete.productId.Caption)</span></th>
+} @* productDelete.productId.Visible (end) *@
+@if (productDelete._name.Visible) { // productDelete._name.Visible (begin)
+        <th class="@Html.Raw(productDelete._name.HeaderCellClass)"><span id="elh_product__name" class="product__name">@Html.Raw(productDelete._name.Caption)</span></th>
+} @* productDelete._name.Visible (end) *@
+@if (productDelete.description.Visible) { // productDelete.description.Visible (begin)
+        <th class="@Html.Raw(productDelete.description.HeaderCellClass)"><span id="elh_product_description" class="product_description">@Html.Raw(productDelete.description.Caption)</span></th>
+} @* productDelete.description.Visible (end) *@
+@if (productDelete.unitPrice.Visible) { // productDelete.unitPrice.Visible (begin)
+        <th class="@Html.Raw(productDelete.unitPrice.HeaderCellClass)"><span id="elh_product_unitPrice" class="product_unitPrice">@Html.Raw(productDelete.unitPrice.Caption)</span></th>
+} @* productDelete.unitPrice.Visible (end) *@
+@if (productDelete.maximumQuantity.Visible) { // productDelete.maximumQuantity.Visible (begin)
+        <th class="@Html.Raw(productDelete.maximumQuantity.HeaderCellClass)"><span id="elh_product_maximumQuantity" class="product_maximumQuantity">@Html.Raw(productDelete.maximumQuantity.Caption)</span></th>
+} @* productDelete.maximumQuantity.Visible (end) *@
+    </tr>
+    </thead>
+    <tbody>
+@{ productDelete.RecordCount = 0; }
+@while (productDelete.Recordset != null && await productDelete.Recordset.ReadAsync()) { // DN
+    productDelete.RecordCount++;
+    productDelete.RowCount++;
+
+    // Set row properties
+    productDelete.ResetAttributes();
+    productDelete.RowType = RowType.View; // View
+
+    // Get the field contents
+    await productDelete.LoadRowValues(productDelete.Recordset);
+
+    // Render row
+    await productDelete.RenderRow();
+    <tr @Html.Raw(productDelete.RowAttributes)>
+@if (productDelete.productId.Visible) { // productDelete.productId.Visible (begin)
+        <td @Html.Raw(productDelete.productId.CellAttributes)>
+<span id="el@(productDelete.RowCount)_product_productId" class="el_product_productId">
+<span @Html.Raw(productDelete.productId.ViewAttributes)>
+@Html.Raw(productDelete.productId.GetViewValue())</span>
+</span></td>
+} @* productDelete.productId.Visible (end) *@
+@if (productDelete._name.Visible) { // productDelete._name.Visible (begin)
+        <td @Html.Raw(productDelete._name.CellAttributes)>
+<span id="el@(productDelete.RowCount)_product__name" class="el_product__name">
+<span @Html.Raw(productDelete._name.ViewAttributes)>
+@Html.Raw(productDelete._name.GetViewValue())</span>
+</span></td>
+} @* productDelete._name.Visible (end) *@
+@if (productDelete.description.Visible) { // productDelete.description.Visible (begin)
+        <td @Html.Raw(productDelete.description.CellAttributes)>
+<span id="el@(productDelete.RowCount)_product_description" class="el_product_description">
+<span @Html.Raw(productDelete.description.ViewAttributes)>
+@Html.Raw(productDelete.description.GetViewValue())</span>
+</span></td>
+} @* productDelete.description.Visible (end) *@
+@if (productDelete.unitPrice.Visible) { // productDelete.unitPrice.Visible (begin)
+        <td @Html.Raw(productDelete.unitPrice.CellAttributes)>
+<span id="el@(productDelete.RowCount)_product_unitPrice" class="el_product_unitPrice">
+<span @Html.Raw(productDelete.unitPrice.ViewAttributes)>
+@Html.Raw(productDelete.unitPrice.GetViewValue())</span>
+</span></td>
+} @* productDelete.unitPrice.Visible (end) *@
+@if (productDelete.maximumQuantity.Visible) { // productDelete.maximumQuantity.Visible (begin)
+        <td @Html.Raw(productDelete.maximumQuantity.CellAttributes)>
+<span id="el@(productDelete.RowCount)_product_maximumQuantity" class="el_product_maximumQuantity">
+<span @Html.Raw(productDelete.maximumQuantity.ViewAttributes)>
+@Html.Raw(productDelete.maximumQuantity.GetViewValue())</span>
+</span></td>
+} @* productDelete.maximumQuantity.Visible (end) *@
+    </tr>
+}
+@{ productDelete.CloseRecordset(); }
+</tbody>
+</table>
+</div>
+</div>
+<div class="ew-buttons ew-desktop-buttons">
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("DeleteBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(productDelete.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+</div>
+</form>
+@productDelete.ShowPageFooter()
+@Html.Raw(GetDebugMessage())
+@ElapsedTime()
+<script>
+loadjs.ready("load", function() {
+    // Write your table-specific startup script here
+    // document.write("page loaded");
+});
+</script>

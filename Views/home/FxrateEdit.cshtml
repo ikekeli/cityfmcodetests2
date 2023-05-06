@@ -1,0 +1,200 @@
+@{
+    // View
+    View = this;
+
+    // Check action result
+    if (fxrateEdit.ActionResult is EmptyResult) { // Terminate page
+        return;
+    }
+
+    // Layout
+    if (!fxrateEdit.UseLayout) // UseLayout = false // DN
+        Layout = "";
+    else
+        Layout = "_Layout";
+
+    // Local variables (Temp data)
+    #pragma warning disable 168
+    string? sqlWrk, filterWrk, whereWrk, curVal, dispVal;
+    List<Dictionary<string, object>>? rswrk;
+    string[]? arWrk;
+    List<object?>? listWrk;
+    object? guidWrk;
+    Func<string>? lookupFilter;
+    #pragma warning restore 168
+}
+<script>
+loadjs.ready("head", function() {
+    // Write your client script here, no need to add script tags.
+});
+</script>
+@fxrateEdit.ShowPageHeader()
+@fxrateEdit.ShowMessages()
+<main class="edit">
+<form name="ffxrateedit" id="ffxrateedit" class="@(fxrateEdit.FormClassName)" action="@AppPath(CurrentPageName())" method="post" novalidate autocomplete="on">
+<script>
+var currentTable = @Html.Raw(ConvertToJson(fxrateEdit.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { fxrate: currentTable } });
+var currentPageID = ew.PAGE_ID = "edit";
+var currentForm;
+var ffxrateedit;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery;
+    let fields = currentTable.fields;
+
+    // Form object
+    let form = new ew.FormBuilder()
+        .setId("ffxrateedit")
+        .setPageId("edit")
+
+        // Add fields
+        .setFields([
+
+            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+            ["sourceCurrency", [fields.sourceCurrency.visible && fields.sourceCurrency.required ? ew.Validators.required(fields.sourceCurrency.caption) : null], fields.sourceCurrency.isInvalid],
+            ["targetCurrency", [fields.targetCurrency.visible && fields.targetCurrency.required ? ew.Validators.required(fields.targetCurrency.caption) : null], fields.targetCurrency.isInvalid],
+            ["rate", [fields.rate.visible && fields.rate.required ? ew.Validators.required(fields.rate.caption) : null, ew.Validators.float], fields.rate.isInvalid]
+        ])
+
+        // Form_CustomValidate
+        .setCustomValidate(
+            function(fobj) { // DO NOT CHANGE THIS LINE!
+                    // Your custom validation code here, return false if invalid.
+                    return true;
+                }
+        )
+
+        // Use JavaScript validation or not
+        .setValidateRequired(ew.CLIENT_VALIDATE)
+
+        // Dynamic selection lists
+        .setLists({
+        })
+        .build();
+    window[form.id] = form;
+    currentForm = form;
+    loadjs.done(form.id);
+});
+</script>
+@if (CurrentPage.CheckToken) {
+    <input type="hidden" name="@Config.TokenNameKey" value="@Config.TokenName"><!-- CSRF token name -->
+    @Html.AntiForgeryToken()
+}
+@if (fxrateEdit.IsConfirm) { // Confirm page
+<input type="hidden" name="action" id="action" value="update">
+<input type="hidden" name="confirm" id="confirm" value="confirm">
+} else {
+<input type="hidden" name="action" id="action" value="confirm">
+}
+<input type="hidden" name="modal" value="@ConvertToInt(fxrateEdit.IsModal)">
+@if (IsJsonResponse()) {
+<input type="hidden" name="json" value="1">
+}
+<input type="hidden" name="@(fxrateEdit.OldKeyName)" value="@Html.Raw(fxrateEdit.OldKey)">
+<div class="ew-edit-div"><!-- page* -->
+@if (fxrateEdit.id.Visible) { // fxrateEdit.id.Visible (begin)
+    <div id="r_id" @Html.Raw(fxrateEdit.id.RowAttributes)>
+        <label id="elh_fxrate_id" class="@(fxrateEdit.LeftColumnClass)">@Html.Raw(fxrateEdit.id.Caption)@Html.Raw(fxrateEdit.id.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(fxrateEdit.RightColumnClass)"><div @Html.Raw(fxrateEdit.id.CellAttributes)>
+@if (!fxrateEdit.IsConfirm) { // id (begin)
+<span id="el_fxrate_id">
+<span @Html.Raw(fxrateEdit.id.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(fxrateEdit.id.EditValue)))"></span>
+<input type="hidden" data-table="fxrate" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="@Html.Raw(HtmlEncode(fxrateEdit.id.CurrentValue))">
+</span>
+} else { // id (confirm)
+<span @Html.Raw(fxrateEdit.id.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(fxrateEdit.id.ViewValue)))"></span>
+<input type="hidden" data-table="fxrate" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="@Html.Raw(HtmlEncode(fxrateEdit.id.FormValue))">
+} @* id (end) *@
+</div></div>
+    </div>
+} @* fxrateEdit.id.Visible (end) *@
+@if (fxrateEdit.sourceCurrency.Visible) { // fxrateEdit.sourceCurrency.Visible (begin)
+    <div id="r_sourceCurrency" @Html.Raw(fxrateEdit.sourceCurrency.RowAttributes)>
+        <label id="elh_fxrate_sourceCurrency" for="x_sourceCurrency" class="@(fxrateEdit.LeftColumnClass)">@Html.Raw(fxrateEdit.sourceCurrency.Caption)@Html.Raw(fxrateEdit.sourceCurrency.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(fxrateEdit.RightColumnClass)"><div @Html.Raw(fxrateEdit.sourceCurrency.CellAttributes)>
+@if (!fxrateEdit.IsConfirm) { // sourceCurrency (begin)
+<span id="el_fxrate_sourceCurrency">
+<input type="@(fxrateEdit.sourceCurrency.InputTextType)" name="x_sourceCurrency" id="x_sourceCurrency" data-table="fxrate" data-field="x_sourceCurrency" value="@Html.Raw(fxrateEdit.sourceCurrency.EditValue)" size="30" maxlength="250" placeholder="@Html.Raw(HtmlEncode(fxrateEdit.sourceCurrency.PlaceHolder))" data-format-pattern="@(fxrateEdit.sourceCurrency.FormatPattern)"@Html.Raw(fxrateEdit.sourceCurrency.EditAttributes) aria-describedby="x_sourceCurrency_help">
+@Html.Raw(fxrateEdit.sourceCurrency.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(fxrateEdit.sourceCurrency.GetErrorMessage())</div>
+</span>
+} else { // sourceCurrency (confirm)
+<span @Html.Raw(fxrateEdit.sourceCurrency.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(fxrateEdit.sourceCurrency.ViewValue)))"></span>
+<input type="hidden" data-table="fxrate" data-field="x_sourceCurrency" data-hidden="1" name="x_sourceCurrency" id="x_sourceCurrency" value="@Html.Raw(HtmlEncode(fxrateEdit.sourceCurrency.FormValue))">
+} @* sourceCurrency (end) *@
+</div></div>
+    </div>
+} @* fxrateEdit.sourceCurrency.Visible (end) *@
+@if (fxrateEdit.targetCurrency.Visible) { // fxrateEdit.targetCurrency.Visible (begin)
+    <div id="r_targetCurrency" @Html.Raw(fxrateEdit.targetCurrency.RowAttributes)>
+        <label id="elh_fxrate_targetCurrency" for="x_targetCurrency" class="@(fxrateEdit.LeftColumnClass)">@Html.Raw(fxrateEdit.targetCurrency.Caption)@Html.Raw(fxrateEdit.targetCurrency.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(fxrateEdit.RightColumnClass)"><div @Html.Raw(fxrateEdit.targetCurrency.CellAttributes)>
+@if (!fxrateEdit.IsConfirm) { // targetCurrency (begin)
+<span id="el_fxrate_targetCurrency">
+<input type="@(fxrateEdit.targetCurrency.InputTextType)" name="x_targetCurrency" id="x_targetCurrency" data-table="fxrate" data-field="x_targetCurrency" value="@Html.Raw(fxrateEdit.targetCurrency.EditValue)" size="30" maxlength="250" placeholder="@Html.Raw(HtmlEncode(fxrateEdit.targetCurrency.PlaceHolder))" data-format-pattern="@(fxrateEdit.targetCurrency.FormatPattern)"@Html.Raw(fxrateEdit.targetCurrency.EditAttributes) aria-describedby="x_targetCurrency_help">
+@Html.Raw(fxrateEdit.targetCurrency.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(fxrateEdit.targetCurrency.GetErrorMessage())</div>
+</span>
+} else { // targetCurrency (confirm)
+<span @Html.Raw(fxrateEdit.targetCurrency.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(fxrateEdit.targetCurrency.ViewValue)))"></span>
+<input type="hidden" data-table="fxrate" data-field="x_targetCurrency" data-hidden="1" name="x_targetCurrency" id="x_targetCurrency" value="@Html.Raw(HtmlEncode(fxrateEdit.targetCurrency.FormValue))">
+} @* targetCurrency (end) *@
+</div></div>
+    </div>
+} @* fxrateEdit.targetCurrency.Visible (end) *@
+@if (fxrateEdit.rate.Visible) { // fxrateEdit.rate.Visible (begin)
+    <div id="r_rate" @Html.Raw(fxrateEdit.rate.RowAttributes)>
+        <label id="elh_fxrate_rate" for="x_rate" class="@(fxrateEdit.LeftColumnClass)">@Html.Raw(fxrateEdit.rate.Caption)@Html.Raw(fxrateEdit.rate.Required ? Language.Phrase("FieldRequiredIndicator") : "")</label>
+        <div class="@(fxrateEdit.RightColumnClass)"><div @Html.Raw(fxrateEdit.rate.CellAttributes)>
+@if (!fxrateEdit.IsConfirm) { // rate (begin)
+<span id="el_fxrate_rate">
+<input type="@(fxrateEdit.rate.InputTextType)" name="x_rate" id="x_rate" data-table="fxrate" data-field="x_rate" value="@Html.Raw(fxrateEdit.rate.EditValue)" size="30" placeholder="@Html.Raw(HtmlEncode(fxrateEdit.rate.PlaceHolder))" data-format-pattern="@(fxrateEdit.rate.FormatPattern)"@Html.Raw(fxrateEdit.rate.EditAttributes) aria-describedby="x_rate_help">
+@Html.Raw(fxrateEdit.rate.GetCustomMessage)
+<div class="invalid-feedback">@Html.Raw(fxrateEdit.rate.GetErrorMessage())</div>
+</span>
+} else { // rate (confirm)
+<span @Html.Raw(fxrateEdit.rate.ViewAttributes)>
+<input type="text" readonly class="form-control-plaintext" value="@Html.Raw(RemoveHtml(ConvertToString(fxrateEdit.rate.ViewValue)))"></span>
+<input type="hidden" data-table="fxrate" data-field="x_rate" data-hidden="1" name="x_rate" id="x_rate" value="@Html.Raw(HtmlEncode(fxrateEdit.rate.FormValue))">
+} @* rate (end) *@
+</div></div>
+    </div>
+} @* fxrateEdit.rate.Visible (end) *@
+</div><!-- /page* -->
+@{ fxrateEdit.CloseRecordset(); }
+@Html.Raw(fxrateEdit.IsModal ? "<template class=\"ew-modal-buttons\">" : "<div class=\"row ew-buttons\">")<!-- buttons .row -->
+    <div class="@(fxrateEdit.OffsetColumnClass)"><!-- buttons offset -->
+@if (!fxrateEdit.IsConfirm) { // Confirm page
+    <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="ffxrateedit" data-ew-action="set-action" data-value="confirm">@Html.Raw(Language.Phrase("SaveBtn"))</button>
+@if (IsJsonResponse()) {
+    <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-bs-dismiss="modal">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+} else {
+    <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" form="ffxrateedit" data-href="@AppPath(fxrateEdit.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+}
+} else {
+    <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="ffxrateedit">@Html.Raw(Language.Phrase("ConfirmBtn"))</button>
+    <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="submit" form="ffxrateedit" data-ew-action="set-action" data-value="cancel">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+}
+    </div><!-- /buttons offset -->
+@Html.Raw(fxrateEdit.IsModal ? "</template>" : "</div>")<!-- /buttons .row -->
+</form>
+</main>
+@fxrateEdit.ShowPageFooter()
+@Html.Raw(GetDebugMessage())
+@ElapsedTime()
+<script>
+// Field event handlers
+loadjs.ready("head", function() {
+    ew.addEventHandlers("fxrate");
+});
+</script>
+<script>
+loadjs.ready("load", function() {
+    // Write your table-specific startup script here
+    // document.write("page loaded");
+});
+</script>

@@ -1,0 +1,145 @@
+@{
+    // View
+    View = this;
+
+    // Check action result
+    if (orderDelete.ActionResult is EmptyResult) { // Terminate page
+        return;
+    }
+
+    // Layout
+    if (!orderDelete.UseLayout) // UseLayout = false // DN
+        Layout = "";
+    else
+        Layout = "_Layout";
+
+    // Local variables (Temp data)
+    #pragma warning disable 168
+    string? sqlWrk, filterWrk, whereWrk, curVal, dispVal;
+    List<Dictionary<string, object>>? rswrk;
+    string[]? arWrk;
+    List<object?>? listWrk;
+    object? guidWrk;
+    Func<string>? lookupFilter;
+    #pragma warning restore 168
+}
+<script>
+var currentTable = @Html.Raw(ConvertToJson(orderDelete.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { order: currentTable } });
+var currentPageID = ew.PAGE_ID = "delete";
+var currentForm;
+var forderdelete;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery;
+    let fields = currentTable.fields;
+
+    // Form object
+    let form = new ew.FormBuilder()
+        .setId("forderdelete")
+        .setPageId("delete")
+        .build();
+    window[form.id] = form;
+    currentForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<script>
+loadjs.ready("head", function() {
+    // Write your client script here, no need to add script tags.
+});
+</script>
+@orderDelete.ShowPageHeader()
+@orderDelete.ShowMessages()
+<form name="forderdelete" id="forderdelete" class="ew-form ew-delete-form" action="@AppPath(CurrentPageName())" method="post" novalidate autocomplete="on">
+@if (CurrentPage.CheckToken) {
+    <input type="hidden" name="@Config.TokenNameKey" value="@Config.TokenName"><!-- CSRF token name -->
+    @Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="delete">
+@foreach (string key in orderDelete.RecordKeys) {
+<input type="hidden" name="key_m[]" value="@key">
+}
+<div class="card ew-card ew-grid @(orderDelete.TableGridClass)">
+<div class="card-body ew-grid-middle-panel @(orderDelete.TableContainerClass)" style="@(orderDelete.TableContainerStyle)">
+<table class="@(orderDelete.TableClass)">
+    <thead>
+    <tr class="ew-table-header">
+@if (orderDelete.customerID.Visible) { // orderDelete.customerID.Visible (begin)
+        <th class="@Html.Raw(orderDelete.customerID.HeaderCellClass)"><span id="elh_order_customerID" class="order_customerID">@Html.Raw(orderDelete.customerID.Caption)</span></th>
+} @* orderDelete.customerID.Visible (end) *@
+@if (orderDelete.customerName.Visible) { // orderDelete.customerName.Visible (begin)
+        <th class="@Html.Raw(orderDelete.customerName.HeaderCellClass)"><span id="elh_order_customerName" class="order_customerName">@Html.Raw(orderDelete.customerName.Caption)</span></th>
+} @* orderDelete.customerName.Visible (end) *@
+@if (orderDelete.customerEmail.Visible) { // orderDelete.customerEmail.Visible (begin)
+        <th class="@Html.Raw(orderDelete.customerEmail.HeaderCellClass)"><span id="elh_order_customerEmail" class="order_customerEmail">@Html.Raw(orderDelete.customerEmail.Caption)</span></th>
+} @* orderDelete.customerEmail.Visible (end) *@
+@if (orderDelete.lineItems.Visible) { // orderDelete.lineItems.Visible (begin)
+        <th class="@Html.Raw(orderDelete.lineItems.HeaderCellClass)"><span id="elh_order_lineItems" class="order_lineItems">@Html.Raw(orderDelete.lineItems.Caption)</span></th>
+} @* orderDelete.lineItems.Visible (end) *@
+    </tr>
+    </thead>
+    <tbody>
+@{ orderDelete.RecordCount = 0; }
+@while (orderDelete.Recordset != null && await orderDelete.Recordset.ReadAsync()) { // DN
+    orderDelete.RecordCount++;
+    orderDelete.RowCount++;
+
+    // Set row properties
+    orderDelete.ResetAttributes();
+    orderDelete.RowType = RowType.View; // View
+
+    // Get the field contents
+    await orderDelete.LoadRowValues(orderDelete.Recordset);
+
+    // Render row
+    await orderDelete.RenderRow();
+    <tr @Html.Raw(orderDelete.RowAttributes)>
+@if (orderDelete.customerID.Visible) { // orderDelete.customerID.Visible (begin)
+        <td @Html.Raw(orderDelete.customerID.CellAttributes)>
+<span id="el@(orderDelete.RowCount)_order_customerID" class="el_order_customerID">
+<span @Html.Raw(orderDelete.customerID.ViewAttributes)>
+@Html.Raw(orderDelete.customerID.GetViewValue())</span>
+</span></td>
+} @* orderDelete.customerID.Visible (end) *@
+@if (orderDelete.customerName.Visible) { // orderDelete.customerName.Visible (begin)
+        <td @Html.Raw(orderDelete.customerName.CellAttributes)>
+<span id="el@(orderDelete.RowCount)_order_customerName" class="el_order_customerName">
+<span @Html.Raw(orderDelete.customerName.ViewAttributes)>
+@Html.Raw(orderDelete.customerName.GetViewValue())</span>
+</span></td>
+} @* orderDelete.customerName.Visible (end) *@
+@if (orderDelete.customerEmail.Visible) { // orderDelete.customerEmail.Visible (begin)
+        <td @Html.Raw(orderDelete.customerEmail.CellAttributes)>
+<span id="el@(orderDelete.RowCount)_order_customerEmail" class="el_order_customerEmail">
+<span @Html.Raw(orderDelete.customerEmail.ViewAttributes)>
+@Html.Raw(orderDelete.customerEmail.GetViewValue())</span>
+</span></td>
+} @* orderDelete.customerEmail.Visible (end) *@
+@if (orderDelete.lineItems.Visible) { // orderDelete.lineItems.Visible (begin)
+        <td @Html.Raw(orderDelete.lineItems.CellAttributes)>
+<span id="el@(orderDelete.RowCount)_order_lineItems" class="el_order_lineItems">
+<span @Html.Raw(orderDelete.lineItems.ViewAttributes)>
+@Html.Raw(orderDelete.lineItems.GetViewValue())</span>
+</span></td>
+} @* orderDelete.lineItems.Visible (end) *@
+    </tr>
+}
+@{ orderDelete.CloseRecordset(); }
+</tbody>
+</table>
+</div>
+</div>
+<div class="ew-buttons ew-desktop-buttons">
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("DeleteBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(orderDelete.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+</div>
+</form>
+@orderDelete.ShowPageFooter()
+@Html.Raw(GetDebugMessage())
+@ElapsedTime()
+<script>
+loadjs.ready("load", function() {
+    // Write your table-specific startup script here
+    // document.write("page loaded");
+});
+</script>

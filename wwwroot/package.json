@@ -1,0 +1,11 @@
+{
+    "name": "cityfmcodetests",
+    "version": "20.2.2",
+    "description": "cityfmcodetests",
+    "license": "SEE LICENSE IN LICENSE.md",
+    "private": true,
+    "dependencies": {},
+    "engines": {
+        "node": ">=16"
+    }
+}

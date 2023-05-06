@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <RazorCompileOnBuild>false</RazorCompileOnBuild>
+        <RazorCompileOnPublish>false</RazorCompileOnPublish>
+        <AssemblyName>Zaharuddin</AssemblyName>
+        <PackageId>Zaharuddin</PackageId>
+        <ServerGarbageCollection>false</ServerGarbageCollection>
+        <PublishSingleFile>false</PublishSingleFile>
+        <SelfContained>false</SelfContained>
+        <RuntimeIdentifier></RuntimeIdentifier>
+        <PublishReadyToRun>false</PublishReadyToRun>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);CS1591;CA1416;CS8632</NoWarn>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Dapper" Version="2.0.123"/>
+        <PackageReference Include="SqlKata" Version="3.0.0-beta"/>
+        <PackageReference Include="SqlKata.Execution" Version="3.0.0-beta"/>
+        <PackageReference Include="Marvin.Cache.Headers" Version="6.1.0"/>
+        <PackageReference Include="AngleSharp" Version="0.17.1"/>
+        <PackageReference Include="MetadataExtractor" Version="2.7.2"/>
+        <PackageReference Include="HtmlSanitizer" Version="7.1.542"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="12.2.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9"/>
+        <PackageReference Include="Mime-Detective" Version="22.7.21"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.23.1"/>
+        <PackageReference Include="MailKit" Version="3.4.1"/>
+        <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0"/>
+        <PackageReference Include="Autofac" Version="6.5.0"/>
+        <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.OpenApi" Version="1.4.3"/>
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>
+        <PackageReference Include="libphonenumber-csharp" Version="8.12.56"/>
+        <PackageReference Include="MySql.Data" Version="8.0.31"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="wwwroot/node_modules/**" CopyToPublishDirectory="PreserveNewest"/>
+    </ItemGroup>
+    <ItemGroup>
+        <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2"/>
+    </ItemGroup>
+</Project>

@@ -1,0 +1,145 @@
+@{
+    // View
+    View = this;
+
+    // Check action result
+    if (fxrateDelete.ActionResult is EmptyResult) { // Terminate page
+        return;
+    }
+
+    // Layout
+    if (!fxrateDelete.UseLayout) // UseLayout = false // DN
+        Layout = "";
+    else
+        Layout = "_Layout";
+
+    // Local variables (Temp data)
+    #pragma warning disable 168
+    string? sqlWrk, filterWrk, whereWrk, curVal, dispVal;
+    List<Dictionary<string, object>>? rswrk;
+    string[]? arWrk;
+    List<object?>? listWrk;
+    object? guidWrk;
+    Func<string>? lookupFilter;
+    #pragma warning restore 168
+}
+<script>
+var currentTable = @Html.Raw(ConvertToJson(fxrateDelete.ToClientVar()));
+ew.deepAssign(ew.vars, { tables: { fxrate: currentTable } });
+var currentPageID = ew.PAGE_ID = "delete";
+var currentForm;
+var ffxratedelete;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery;
+    let fields = currentTable.fields;
+
+    // Form object
+    let form = new ew.FormBuilder()
+        .setId("ffxratedelete")
+        .setPageId("delete")
+        .build();
+    window[form.id] = form;
+    currentForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<script>
+loadjs.ready("head", function() {
+    // Write your client script here, no need to add script tags.
+});
+</script>
+@fxrateDelete.ShowPageHeader()
+@fxrateDelete.ShowMessages()
+<form name="ffxratedelete" id="ffxratedelete" class="ew-form ew-delete-form" action="@AppPath(CurrentPageName())" method="post" novalidate autocomplete="on">
+@if (CurrentPage.CheckToken) {
+    <input type="hidden" name="@Config.TokenNameKey" value="@Config.TokenName"><!-- CSRF token name -->
+    @Html.AntiForgeryToken()
+}
+<input type="hidden" name="action" id="action" value="delete">
+@foreach (string key in fxrateDelete.RecordKeys) {
+<input type="hidden" name="key_m[]" value="@key">
+}
+<div class="card ew-card ew-grid @(fxrateDelete.TableGridClass)">
+<div class="card-body ew-grid-middle-panel @(fxrateDelete.TableContainerClass)" style="@(fxrateDelete.TableContainerStyle)">
+<table class="@(fxrateDelete.TableClass)">
+    <thead>
+    <tr class="ew-table-header">
+@if (fxrateDelete.id.Visible) { // fxrateDelete.id.Visible (begin)
+        <th class="@Html.Raw(fxrateDelete.id.HeaderCellClass)"><span id="elh_fxrate_id" class="fxrate_id">@Html.Raw(fxrateDelete.id.Caption)</span></th>
+} @* fxrateDelete.id.Visible (end) *@
+@if (fxrateDelete.sourceCurrency.Visible) { // fxrateDelete.sourceCurrency.Visible (begin)
+        <th class="@Html.Raw(fxrateDelete.sourceCurrency.HeaderCellClass)"><span id="elh_fxrate_sourceCurrency" class="fxrate_sourceCurrency">@Html.Raw(fxrateDelete.sourceCurrency.Caption)</span></th>
+} @* fxrateDelete.sourceCurrency.Visible (end) *@
+@if (fxrateDelete.targetCurrency.Visible) { // fxrateDelete.targetCurrency.Visible (begin)
+        <th class="@Html.Raw(fxrateDelete.targetCurrency.HeaderCellClass)"><span id="elh_fxrate_targetCurrency" class="fxrate_targetCurrency">@Html.Raw(fxrateDelete.targetCurrency.Caption)</span></th>
+} @* fxrateDelete.targetCurrency.Visible (end) *@
+@if (fxrateDelete.rate.Visible) { // fxrateDelete.rate.Visible (begin)
+        <th class="@Html.Raw(fxrateDelete.rate.HeaderCellClass)"><span id="elh_fxrate_rate" class="fxrate_rate">@Html.Raw(fxrateDelete.rate.Caption)</span></th>
+} @* fxrateDelete.rate.Visible (end) *@
+    </tr>
+    </thead>
+    <tbody>
+@{ fxrateDelete.RecordCount = 0; }
+@while (fxrateDelete.Recordset != null && await fxrateDelete.Recordset.ReadAsync()) { // DN
+    fxrateDelete.RecordCount++;
+    fxrateDelete.RowCount++;
+
+    // Set row properties
+    fxrateDelete.ResetAttributes();
+    fxrateDelete.RowType = RowType.View; // View
+
+    // Get the field contents
+    await fxrateDelete.LoadRowValues(fxrateDelete.Recordset);
+
+    // Render row
+    await fxrateDelete.RenderRow();
+    <tr @Html.Raw(fxrateDelete.RowAttributes)>
+@if (fxrateDelete.id.Visible) { // fxrateDelete.id.Visible (begin)
+        <td @Html.Raw(fxrateDelete.id.CellAttributes)>
+<span id="el@(fxrateDelete.RowCount)_fxrate_id" class="el_fxrate_id">
+<span @Html.Raw(fxrateDelete.id.ViewAttributes)>
+@Html.Raw(fxrateDelete.id.GetViewValue())</span>
+</span></td>
+} @* fxrateDelete.id.Visible (end) *@
+@if (fxrateDelete.sourceCurrency.Visible) { // fxrateDelete.sourceCurrency.Visible (begin)
+        <td @Html.Raw(fxrateDelete.sourceCurrency.CellAttributes)>
+<span id="el@(fxrateDelete.RowCount)_fxrate_sourceCurrency" class="el_fxrate_sourceCurrency">
+<span @Html.Raw(fxrateDelete.sourceCurrency.ViewAttributes)>
+@Html.Raw(fxrateDelete.sourceCurrency.GetViewValue())</span>
+</span></td>
+} @* fxrateDelete.sourceCurrency.Visible (end) *@
+@if (fxrateDelete.targetCurrency.Visible) { // fxrateDelete.targetCurrency.Visible (begin)
+        <td @Html.Raw(fxrateDelete.targetCurrency.CellAttributes)>
+<span id="el@(fxrateDelete.RowCount)_fxrate_targetCurrency" class="el_fxrate_targetCurrency">
+<span @Html.Raw(fxrateDelete.targetCurrency.ViewAttributes)>
+@Html.Raw(fxrateDelete.targetCurrency.GetViewValue())</span>
+</span></td>
+} @* fxrateDelete.targetCurrency.Visible (end) *@
+@if (fxrateDelete.rate.Visible) { // fxrateDelete.rate.Visible (begin)
+        <td @Html.Raw(fxrateDelete.rate.CellAttributes)>
+<span id="el@(fxrateDelete.RowCount)_fxrate_rate" class="el_fxrate_rate">
+<span @Html.Raw(fxrateDelete.rate.ViewAttributes)>
+@Html.Raw(fxrateDelete.rate.GetViewValue())</span>
+</span></td>
+} @* fxrateDelete.rate.Visible (end) *@
+    </tr>
+}
+@{ fxrateDelete.CloseRecordset(); }
+</tbody>
+</table>
+</div>
+</div>
+<div class="ew-buttons ew-desktop-buttons">
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit">@Html.Raw(Language.Phrase("DeleteBtn"))</button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="@AppPath(fxrateDelete.ReturnUrl)">@Html.Raw(Language.Phrase("CancelBtn"))</button>
+</div>
+</form>
+@fxrateDelete.ShowPageFooter()
+@Html.Raw(GetDebugMessage())
+@ElapsedTime()
+<script>
+loadjs.ready("load", function() {
+    // Write your table-specific startup script here
+    // document.write("page loaded");
+});
+</script>
