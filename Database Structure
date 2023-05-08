@@ -1,0 +1,32 @@
+Database: cityfmcodetests
+
+CREATE TABLE `fxrate` (
+  `id` bigint(22) NOT NULL AUTO_INCREMENT,
+  `sourceCurrency` varchar(250) DEFAULT NULL,
+  `targetCurrency` varchar(250) DEFAULT NULL,
+  `rate` double DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `order` (
+  `customerID` bigint(22) NOT NULL AUTO_INCREMENT,
+  `customerName` varchar(250) NOT NULL,
+  `customerEmail` varchar(150) NOT NULL,
+  `lineItems` varchar(250) NOT NULL,
+  PRIMARY KEY (`customerID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+CREATE TABLE `orderlineitem` (
+  `productId` varchar(50) NOT NULL,
+  `quantity` int(22) NOT NULL,
+  PRIMARY KEY (`productId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `product` (
+  `productId` varchar(50) NOT NULL,
+  `name` varchar(200) NOT NULL,
+  `description` varchar(250) NOT NULL,
+  `unitPrice` double NOT NULL,
+  `maximumQuantity` int(20) DEFAULT NULL,
+  PRIMARY KEY (`productId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
